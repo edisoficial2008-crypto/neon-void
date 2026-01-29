@@ -1,0 +1,38 @@
+from flask import Flask, request, jsonify
+import json
+import os
+
+app = Flask(__name__)
+
+DATA_FILE = "users.json"
+
+def load_users():
+    if not os.path.exists(DATA_FILE):
+        return {}
+    with open(DATA_FILE, "r") as f:
+        return json.load(f)
+
+def save_users(data):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+@app.route("/tap", methods=["POST"])
+def tap():
+    user_id = str(request.json["user_id"])
+    users = load_users()
+
+    if user_id not in users:
+        users[user_id] = {"coins": 0}
+
+    users[user_id]["coins"] += 1
+    save_users(users)
+
+    return jsonify(users[user_id])
+
+@app.route("/user/<user_id>")
+def get_user(user_id):
+    users = load_users()
+    return jsonify(users.get(user_id, {"coins": 0}))
+
+if __name__ == "__main__":
+    app.run()
