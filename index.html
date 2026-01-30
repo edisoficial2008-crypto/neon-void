@@ -2,78 +2,253 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Anime Tap World</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NEON VOID — Energy Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
 
-<div id="privacy" class="overlay">
-  <div class="card">
+<style>
+*{box-sizing:border-box;font-family:Arial}
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  overflow:hidden;
+}
+.bg{
+  position:fixed;
+  inset:0;
+  background:url("https://i.imgur.com/8ZQZQZB.png") center/cover no-repeat;
+  filter:brightness(.35);
+  z-index:0;
+}
+#app{position:relative;z-index:1;height:100vh;width:100vw}
+
+.top{
+  display:flex;
+  justify-content:space-around;
+  padding:10px;
+  font-size:16px;
+}
+
+.tap-zone{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:radial-gradient(circle,#00ffe7,#005);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.bottom{
+  position:absolute;
+  bottom:15px;
+  width:100%;
+  display:flex;
+  justify-content:space-around;
+}
+.btn{
+  background:#111;
+  padding:12px 18px;
+  border-radius:14px;
+  cursor:pointer;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:none;
+  z-index:5;
+}
+.modal-content{
+  background:#111;
+  margin:40px;
+  padding:20px;
+  border-radius:16px;
+  max-height:80vh;
+  overflow:auto;
+}
+.close{
+  position:absolute;
+  top:10px;
+  right:15px;
+  font-size:22px;
+  cursor:pointer;
+}
+
+.shop-item{
+  background:#1a1a1a;
+  margin:10px 0;
+  padding:12px;
+  border-radius:12px;
+}
+
+.privacy{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.privacy-box{
+  background:#111;
+  padding:25px;
+  border-radius:16px;
+  text-align:center;
+}
+.privacy button{
+  margin-top:15px;
+  padding:10px 20px;
+  border-radius:12px;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<div class="privacy" id="privacy">
+  <div class="privacy-box">
     <h2>🔒 Конфиденциальность</h2>
     <p>Прогресс сохраняется</p>
     <button onclick="acceptPrivacy()">Принять</button>
   </div>
 </div>
 
-<div id="app" class="app hidden">
-
+<div id="app">
   <div class="top">
-    💰 <span id="coins">0</span> |
-    ⚡ <span id="power">1</span> |
-    ⏱ <span id="buff">—</span>
+    <div>💰 <span id="coins">0</span></div>
+    <div>⚡ <span id="power">1</span></div>
   </div>
 
-  <div class="tap-zone">
-    <div id="tap-circle" onclick="tap()">TAP</div>
-  </div>
+  <div class="tap-zone" onclick="tap()">TAP</div>
 
-  <div class="menu">
-    <button onclick="openTab('shop')">🛒 Магазин</button>
-    <button onclick="openTab('profile')">👤 Профиль</button>
-    <button onclick="openTab('leader')">🏆 Лидерборд</button>
+  <div class="bottom">
+    <div class="btn" onclick="openModal('shop')">🛒 Магазин</div>
+    <div class="btn" onclick="openModal('profile')">👤 Профиль</div>
+    <div class="btn" onclick="openModal('leaderboard')">🏆 Лидерборд</div>
   </div>
 </div>
 
 <!-- МАГАЗИН -->
-<div id="shop" class="panel hidden">
-  <div class="panel-head">
-    <h3>🛒 Магазин</h3>
-    <span class="close" onclick="closePanels()">✖</span>
-  </div>
+<div class="modal" id="shop">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✖</div>
+    <h2>🛒 Магазин</h2>
 
-  <button onclick="buy('p1',10)">+1 к тапу — 10</button>
-  <button onclick="buy('p2',50)">+2 к тапу — 50</button>
-  <button onclick="buyTemp(2,100,30)">x2 на 30 сек — 100</button>
-  <button onclick="buyTemp(5,500,60)">x5 на 1 мин — 500</button>
+    <div class="shop-item">
+      ⚡ +1 сила — 50 монет
+      <button onclick="buyPower(1,50)">Купить</button>
+    </div>
+
+    <div class="shop-item">
+      ⚡ +5 сила — 200 монет
+      <button onclick="buyPower(5,200)">Купить</button>
+    </div>
+
+    <div class="shop-item">
+      ⏳ x2 доход (5 мин) — 150 монет
+      <button onclick="buyBoost()">Купить</button>
+    </div>
+  </div>
 </div>
 
 <!-- ПРОФИЛЬ -->
-<div id="profile" class="panel hidden">
-  <div class="panel-head">
-    <h3>👤 Профиль</h3>
-    <span class="close" onclick="closePanels()">✖</span>
+<div class="modal" id="profile">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✖</div>
+    <h2>👤 Профиль</h2>
+    <p>ID: <span id="pid"></span></p>
+    <p>Тапов: <span id="taps"></span></p>
+    <p>Сила: <span id="ppower"></span></p>
+    <p>Монет: <span id="pcoins"></span></p>
   </div>
-
-  <p>ID: <span id="pid"></span></p>
-  <p>Монеты: <span id="pCoins"></span></p>
-  <p>Сила: <span id="pPower"></span></p>
-  <p>Тапов: <span id="pTaps"></span></p>
-  <p>Авто: <span id="pAuto"></span></p>
-  <p>В игре: <span id="pTime"></span></p>
 </div>
 
 <!-- ЛИДЕРБОРД -->
-<div id="leader" class="panel hidden">
-  <div class="panel-head">
-    <h3>🏆 Лидерборд</h3>
-    <span class="close" onclick="closePanels()">✖</span>
+<div class="modal" id="leaderboard">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✖</div>
+    <h2>🏆 Лидерборд</h2>
+    <p>1. Ты — <span id="lcoins"></span> 💰</p>
   </div>
-
-  <p>Скоро…</p>
 </div>
 
-<script src="script.js"></script>
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+let data = JSON.parse(localStorage.getItem("neon")) || {
+  coins:0,
+  power:1,
+  taps:0,
+  boost:1,
+  boostEnd:0
+};
+
+function save(){localStorage.setItem("neon",JSON.stringify(data))}
+
+function update(){
+  document.getElementById("coins").innerText=data.coins;
+  document.getElementById("power").innerText=data.power;
+  document.getElementById("taps").innerText=data.taps;
+  document.getElementById("ppower").innerText=data.power;
+  document.getElementById("pcoins").innerText=data.coins;
+  document.getElementById("lcoins").innerText=data.coins;
+  document.getElementById("pid").innerText=tg.initDataUnsafe?.user?.id || "local";
+}
+
+function tap(){
+  let mult = Date.now()<data.boostEnd?2:1;
+  data.coins += data.power*mult;
+  data.taps++;
+  save();update();
+}
+
+function buyPower(p,c){
+  if(data.coins>=c){
+    data.coins-=c;
+    data.power+=p;
+    save();update();
+  }
+}
+
+function buyBoost(){
+  if(data.coins>=150){
+    data.coins-=150;
+    data.boostEnd=Date.now()+5*60*1000;
+    save();update();
+  }
+}
+
+function openModal(id){
+  document.getElementById(id).style.display="block";
+}
+function closeModal(){
+  document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
+}
+
+function acceptPrivacy(){
+  localStorage.setItem("privacy","1");
+  document.getElementById("privacy").style.display="none";
+}
+
+if(localStorage.getItem("privacy")=="1"){
+  document.getElementById("privacy").style.display="none";
+}
+
+update();
+</script>
 </body>
-    </html>
+</html>
