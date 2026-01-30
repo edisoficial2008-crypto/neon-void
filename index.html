@@ -17,8 +17,8 @@ body{
 .bg{
   position:fixed;
   inset:0;
-  background:url("https://i.imgur.com/8ZQZQZB.png") center/cover no-repeat;
-  filter:brightness(.35);
+  background:url("https://images.wallpapersden.com/image/download/anime-girl-cyberpunk-neon_bmdtbGaUmZqaraWkpJRmZW1lrWdtbWU.jpg") center/cover no-repeat;
+  filter:brightness(.4);
   z-index:0;
 }
 #app{position:relative;z-index:1;height:100vh;width:100vw}
@@ -38,11 +38,11 @@ body{
   width:220px;
   height:220px;
   border-radius:50%;
-  background:radial-gradient(circle,#00ffe7,#005);
+  background:radial-gradient(circle,#00ffe7,#003);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:24px;
+  font-size:26px;
   cursor:pointer;
   user-select:none;
 }
@@ -193,20 +193,19 @@ let data = JSON.parse(localStorage.getItem("neon")) || {
   coins:0,
   power:1,
   taps:0,
-  boost:1,
   boostEnd:0
 };
 
 function save(){localStorage.setItem("neon",JSON.stringify(data))}
 
 function update(){
-  document.getElementById("coins").innerText=data.coins;
-  document.getElementById("power").innerText=data.power;
-  document.getElementById("taps").innerText=data.taps;
-  document.getElementById("ppower").innerText=data.power;
-  document.getElementById("pcoins").innerText=data.coins;
-  document.getElementById("lcoins").innerText=data.coins;
-  document.getElementById("pid").innerText=tg.initDataUnsafe?.user?.id || "local";
+  coins.innerText=data.coins;
+  power.innerText=data.power;
+  taps.innerText=data.taps;
+  ppower.innerText=data.power;
+  pcoins.innerText=data.coins;
+  lcoins.innerText=data.coins;
+  pid.innerText=tg.initDataUnsafe?.user?.id || "local";
 }
 
 function tap(){
@@ -232,21 +231,14 @@ function buyBoost(){
   }
 }
 
-function openModal(id){
-  document.getElementById(id).style.display="block";
-}
-function closeModal(){
-  document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
-}
+function openModal(id){document.getElementById(id).style.display="block";}
+function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none");}
 
 function acceptPrivacy(){
   localStorage.setItem("privacy","1");
-  document.getElementById("privacy").style.display="none";
+  privacy.style.display="none";
 }
-
-if(localStorage.getItem("privacy")=="1"){
-  document.getElementById("privacy").style.display="none";
-}
+if(localStorage.getItem("privacy")=="1") privacy.style.display="none";
 
 update();
 </script>
