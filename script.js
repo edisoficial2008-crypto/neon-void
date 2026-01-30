@@ -1,85 +1,43 @@
-const tg = window.Telegram.WebApp;
-tg.expand();
+let score = 124;
+let energy = 3963;
+const maxEnergy = 4000;
 
-let data = JSON.parse(localStorage.getItem("game")) || {
-  coins:0,
-  power:1,
-  taps:0,
-  auto:false,
-  buff:1,
-  buffEnd:0,
-  start:Date.now(),
-  uid:Math.floor(Math.random()*1e9)
-};
+const scoreEl = document.getElementById("score");
+const energyEl = document.getElementById("energy");
+const tapZone = document.getElementById("tapZone");
 
-function save(){
-  localStorage.setItem("game",JSON.stringify(data));
+tapZone.addEventListener("click", (e) => {
+  if (energy <= 0) return;
+
+  score++;
+  energy--;
+
+  scoreEl.textContent = score;
+  energyEl.textContent = energy;
+
+  showTapNumber(e.clientX, e.clientY);
+});
+
+function showTapNumber(x, y) {
+  const num = document.createElement("div");
+  num.className = "tap-number";
+  num.textContent = "+1";
+  num.style.left = x + "px";
+  num.style.top = y + "px";
+  document.body.appendChild(num);
+
+  setTimeout(() => num.remove(), 1000);
 }
 
-function acceptPrivacy(){
-  localStorage.setItem("privacy","1");
-  document.getElementById("privacy").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
+/* КНОПКИ */
+function openShop() {
+  alert("🛒 Магазин (дальше добавим)");
 }
 
-if(localStorage.getItem("privacy")) acceptPrivacy();
-
-function tap(){
-  let gain=data.power;
-  if(Date.now()<data.buffEnd) gain*=data.buff;
-  data.coins+=gain;
-  data.taps++;
-  update();
+function openProfile() {
+  alert("👤 Профиль");
 }
 
-function buy(type,price){
-  if(data.coins<price) return alert("Мало монет");
-  data.coins-=price;
-  if(type==="p1") data.power+=1;
-  if(type==="p2") data.power+=2;
-  update();
+function openLeaderboard() {
+  alert("🏆 Лидерборд");
 }
-
-function buyTemp(mult,price,sec){
-  if(data.coins<price) return alert("Мало монет");
-  data.coins-=price;
-  data.buff=mult;
-  data.buffEnd=Date.now()+sec*1000;
-  update();
-}
-
-function openTab(id){
-  closePanels();
-  document.getElementById(id).classList.remove("hidden");
-  update();
-}
-
-function closePanels(){
-  ["shop","profile","leader"].forEach(p=>{
-    document.getElementById(p).classList.add("hidden");
-  });
-}
-
-function update(){
-  coins.textContent=data.coins;
-  power.textContent=data.power;
-  buff.textContent=Date.now()<data.buffEnd?"x"+data.buff:"—";
-
-  pid.textContent=data.uid;
-  pCoins.textContent=data.coins;
-  pPower.textContent=data.power;
-  pTaps.textContent=data.taps;
-  pAuto.textContent=data.auto?"Да":"Нет";
-  pTime.textContent=Math.floor((Date.now()-data.start)/1000)+" сек";
-
-  save();
-}
-
-setInterval(()=>{
-  if(data.auto){
-    data.coins+=data.power;
-    update();
-  }
-},1000);
-
-update();
