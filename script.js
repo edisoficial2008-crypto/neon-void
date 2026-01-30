@@ -1,43 +1,31 @@
-let score = 124;
+let points = 124;
 let energy = 3963;
-const maxEnergy = 4000;
 
-const scoreEl = document.getElementById("score");
-const energyEl = document.getElementById("energy");
 const tapZone = document.getElementById("tapZone");
 
 tapZone.addEventListener("click", (e) => {
   if (energy <= 0) return;
 
-  score++;
+  points++;
   energy--;
 
-  scoreEl.textContent = score;
-  energyEl.textContent = energy;
+  document.getElementById("points").innerText = points;
+  document.getElementById("energy").innerText = energy;
 
-  showTapNumber(e.clientX, e.clientY);
-});
-
-function showTapNumber(x, y) {
   const num = document.createElement("div");
   num.className = "tap-number";
-  num.textContent = "+1";
-  num.style.left = x + "px";
-  num.style.top = y + "px";
+  num.innerText = "+1";
+  num.style.left = e.clientX + "px";
+  num.style.top = e.clientY + "px";
+
   document.body.appendChild(num);
-
   setTimeout(() => num.remove(), 1000);
+});
+
+function openModal(id) {
+  document.getElementById(id).style.display = "flex";
 }
 
-/* КНОПКИ */
-function openShop() {
-  alert("🛒 Магазин (дальше добавим)");
-}
-
-function openProfile() {
-  alert("👤 Профиль");
-}
-
-function openLeaderboard() {
-  alert("🏆 Лидерборд");
+function closeModal() {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
 }
