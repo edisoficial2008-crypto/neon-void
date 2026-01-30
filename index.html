@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Neon Void</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Neon Void</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>⚡ Neon Void</h1>
-<div id="coins">0</div>
-<button id="tap">TAP</button>
+  <div id="app">
+    <h1>🌌 NEON VOID</h1>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="script.js"></script>
+    <div id="score">0</div>
+
+    <button id="tap">⚡ TAP ⚡</button>
+
+    <div class="shop">
+      <h2>Магазин</h2>
+      <button onclick="buyBoost()">Буст x2 (10)</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
