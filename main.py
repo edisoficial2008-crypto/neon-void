@@ -12,8 +12,8 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {"status": "Neon Void server online"}
+    return {"status": "Neon Void backend online"}
 
-@app.get("/ping")
-def ping():
-    return {"ping": "pong"}
+@app.post("/tap")
+def tap():
+    return {"coins": 1}
