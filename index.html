@@ -2,254 +2,175 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<title>NEON VOID – Energy Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anime Tap</title>
 
 <style>
-* {margin:0;padding:0;box-sizing:border-box;font-family:Arial}
 body {
-  background: radial-gradient(circle at center, #5a007a, #120016);
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at center, #8f00ff, #120018);
   color: white;
   overflow: hidden;
 }
 
-/* ===== PARTIKLES ===== */
-canvas {
+header {
+  text-align: center;
+  padding: 10px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#score {
+  text-align: center;
+  opacity: 0.8;
+}
+
+#tapArea {
+  width: 200px;
+  height: 200px;
+  margin: 60px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff4bff, #7a00cc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: pointer;
+  box-shadow: 0 0 40px #ff4bff;
+}
+
+nav {
   position: fixed;
-  inset: 0;
-  z-index: -1;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: rgba(0,0,0,0.6);
 }
 
-/* ===== TOP ===== */
-.top {
-  text-align:center;
-  padding:20px;
-}
-.score {
-  font-size:20px;
-  margin-top:5px;
-}
-
-/* ===== TAP BUTTON ===== */
-.tap-wrapper {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:60vh;
-}
-.tap {
-  width:230px;
-  height:230px;
-  border-radius:50%;
-  background: radial-gradient(circle, #ff00ff, #7a008a);
-  box-shadow: 0 0 60px #ff00ff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:42px;
-  cursor:pointer;
-  user-select:none;
-  transition:transform .05s;
-}
-.tap:active { transform: scale(0.95); }
-
-/* ===== MENU ===== */
-.menu {
-  position:fixed;
-  bottom:0;
-  width:100%;
-  display:flex;
-  justify-content:space-around;
-  background:#000000aa;
-  padding:10px 0;
-}
-.menu button {
-  background:none;
-  border:none;
-  color:white;
-  font-size:18px;
+nav button {
+  flex: 1;
+  padding: 15px;
+  font-size: 16px;
+  background: none;
+  color: white;
+  border: none;
 }
 
-/* ===== MODAL ===== */
-.modal {
-  position:fixed;
-  inset:0;
-  background:#000000dd;
-  display:none;
-  padding:20px;
-  overflow:auto;
-}
-.modal h2 { text-align:center; margin-bottom:15px; }
-.close {
-  position:absolute;
-  top:15px;
-  right:20px;
-  font-size:30px;
-  cursor:pointer;
+.screen {
+  display: none;
+  padding: 20px;
 }
 
-/* ===== SHOP ITEMS ===== */
+.screen.active {
+  display: block;
+}
+
 .item {
-  background:#1a0025;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-.item button {
-  margin-top:5px;
-  width:100%;
-  padding:8px;
-  background:#ff00ff;
-  border:none;
-  color:white;
-  border-radius:8px;
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="bg"></canvas>
+<header>NEON VOID</header>
+<div id="score">Очки: <span id="points">0</span></div>
 
-<div class="top">
-  <h1>Anime Tap</h1>
-  <div class="score">Очки: <span id="score">0</span></div>
+<div id="game" class="screen active">
+  <div id="tapArea">TAP</div>
 </div>
 
-<div class="tap-wrapper">
-  <div class="tap" id="tap">TAP</div>
-</div>
-
-<div class="menu">
-  <button onclick="openModal('profile')">👤</button>
-  <button onclick="openModal('shop')">🛒</button>
-  <button onclick="openModal('leader')">🏆</button>
-</div>
-
-<!-- PROFILE -->
-<div class="modal" id="profile">
-  <div class="close" onclick="closeModal()">✖</div>
-  <h2>Профиль</h2>
-  <p>Очки: <span id="pScore"></span></p>
-  <p>Сила тапа: <span id="pPower"></span></p>
-  <p>Авто-тап: <span id="pAuto"></span></p>
-</div>
-
-<!-- SHOP -->
-<div class="modal" id="shop">
-  <div class="close" onclick="closeModal()">✖</div>
-  <h2>Магазин</h2>
-
+<div id="shop" class="screen">
+  <h2>🛒 Магазин</h2>
   <div class="item">
-    <b>+1 к тапу</b><br>Цена: 10
-    <button onclick="buyPower()">Купить</button>
+    +1 за тап — 50 очков
+    <button onclick="buyUpgrade()">Купить</button>
   </div>
-
-  <div class="item">
-    <b>Авто-тап</b><br>+1/сек<br>Цена: 50
-    <button onclick="buyAuto()">Купить</button>
-  </div>
-
-  <div class="item">
-    <b>x2 доход (30 сек)</b><br>Цена: 100
-    <button onclick="buyBoost()">Купить</button>
-  </div>
-
 </div>
 
-<!-- LEADER -->
-<div class="modal" id="leader">
-  <div class="close" onclick="closeModal()">✖</div>
-  <h2>Лидерборд</h2>
-  <p>Скоро онлайн рейтинг 👀</p>
+<div id="profile" class="screen">
+  <h2>👤 Профиль</h2>
+  <p>Очки: <span id="profilePoints">0</span></p>
+  <p>Сила тапа: <span id="tapPower">1</span></p>
 </div>
+
+<div id="leaderboard" class="screen">
+  <h2>🏆 Лидерборд</h2>
+  <ol id="leaders"></ol>
+</div>
+
+<nav>
+  <button onclick="openScreen('game')">🎮</button>
+  <button onclick="openScreen('shop')">🛒</button>
+  <button onclick="openScreen('profile')">👤</button>
+  <button onclick="openScreen('leaderboard')">🏆</button>
+</nav>
 
 <script>
-let score = Number(localStorage.score || 0)
-let power = Number(localStorage.power || 1)
-let auto = Number(localStorage.auto || 0)
-let boost = 1
+let points = parseInt(localStorage.getItem("points")) || 0;
+let power = parseInt(localStorage.getItem("power")) || 1;
 
-const scoreEl = document.getElementById("score")
-scoreEl.textContent = score
+const pointsEl = document.getElementById("points");
 
-tap.onclick = () => {
-  score += power * boost
-  save()
+function save() {
+  localStorage.setItem("points", points);
+  localStorage.setItem("power", power);
 }
 
-setInterval(() => {
-  score += auto * boost
-  save()
-}, 1000)
+function updateUI() {
+  pointsEl.textContent = points;
+  document.getElementById("profilePoints").textContent = points;
+  document.getElementById("tapPower").textContent = power;
+}
 
-function buyPower(){
-  if(score>=10){
-    score-=10
-    power++
-    save()
-  }
-}
-function buyAuto(){
-  if(score>=50){
-    score-=50
-    auto++
-    save()
-  }
-}
-function buyBoost(){
-  if(score>=100){
-    score-=100
-    boost=2
-    setTimeout(()=>boost=1,30000)
-    save()
+document.getElementById("tapArea").onclick = () => {
+  points += power;
+  save();
+  updateUI();
+};
+
+function buyUpgrade() {
+  if (points >= 50) {
+    points -= 50;
+    power += 1;
+    save();
+    updateUI();
+    alert("Апгрейд куплен!");
+  } else {
+    alert("Не хватает очков");
   }
 }
 
-function save(){
-  localStorage.score=score
-  localStorage.power=power
-  localStorage.auto=auto
-  scoreEl.textContent=score
+function openScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(name).classList.add("active");
+
+  if (name === "leaderboard") loadLeaders();
 }
 
-function openModal(id){
-  document.getElementById(id).style.display="block"
-  pScore.textContent=score
-  pPower.textContent=power
-  pAuto.textContent=auto
-}
-function closeModal(){
-  document.querySelectorAll(".modal").forEach(m=>m.style.display="none")
+function loadLeaders() {
+  let best = JSON.parse(localStorage.getItem("leaders")) || [];
+  if (!best.includes(points)) {
+    best.push(points);
+    best.sort((a,b)=>b-a);
+    best = best.slice(0,5);
+    localStorage.setItem("leaders", JSON.stringify(best));
+  }
+  const list = document.getElementById("leaders");
+  list.innerHTML = "";
+  best.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p + " очков";
+    list.appendChild(li);
+  });
 }
 
-/* ===== PARTICLES ===== */
-const c = document.getElementById("bg")
-const ctx = c.getContext("2d")
-function resize(){ c.width=innerWidth; c.height=innerHeight }
-resize(); addEventListener("resize",resize)
-
-let particles = Array.from({length:80},()=>({
-  x:Math.random()*c.width,
-  y:Math.random()*c.height,
-  r:Math.random()*2+1,
-  v:Math.random()*0.5+0.2
-}))
-
-function draw(){
-  ctx.clearRect(0,0,c.width,c.height)
-  particles.forEach(p=>{
-    p.y+=p.v
-    if(p.y>c.height) p.y=0
-    ctx.beginPath()
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
-    ctx.fillStyle="#ff00ff"
-    ctx.fill()
-  })
-  requestAnimationFrame(draw)
-}
-draw()
+updateUI();
 </script>
 
 </body>
-</html>
+  </html>
