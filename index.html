@@ -2,46 +2,43 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Neon Void</title>
+  <title>Neon Sakura</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
-<div id="privacy-screen" class="screen">
+<!-- PRIVACY -->
+<div id="privacy" class="screen">
   <div class="card">
     <h1>🌸 Privacy Policy</h1>
-
-    <div class="policy-text">
-      <p>Добро пожаловать в <b>Neon Void</b>.</p>
-      <p>
-        Мы уважаем вашу конфиденциальность:
-      </p>
+    <div class="text">
+      <p>Мы сохраняем только игровой прогресс.</p>
       <ul>
-        <li>Сохраняется только игровой прогресс</li>
         <li>Используется Telegram ID</li>
         <li>Личные данные не собираются</li>
-        <li>Данные не передаются третьим лицам</li>
-        <li>Вы можете удалить данные в любой момент</li>
+        <li>Данные не передаются</li>
+        <li>Можно удалить данные</li>
       </ul>
-      <p>
-        Используя приложение, вы подтверждаете согласие с данной политикой.
-      </p>
+      <p>Нажимая кнопку ниже, вы соглашаетесь.</p>
     </div>
-
-    <button onclick="acceptPrivacy()">✨ Принять и продолжить</button>
+    <button onclick="accept()">Принять</button>
   </div>
 </div>
 
-<div id="game-screen" class="screen" style="display:none;">
-  <h2>🎮 Neon Void</h2>
+<!-- GAME -->
+<div id="game" class="screen hidden">
+  <h2>🌸 Neon Sakura</h2>
 
   <div id="tap-circle" onclick="tap()">TAP</div>
 
-  <p id="coins">Монеты: 0</p>
+  <div class="info">
+    <p id="coins">Монеты: 0</p>
+    <p id="level">Уровень: 1</p>
+  </div>
 </div>
 
 <script src="script.js"></script>
 </body>
-                                            </html>
+</html>
