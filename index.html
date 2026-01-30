@@ -8,19 +8,15 @@
 
 <style>
 *{box-sizing:border-box;font-family:Arial}
-body{
-  margin:0;
-  background:#000;
-  color:#fff;
-  overflow:hidden;
-}
+body{margin:0;background:#000;color:#fff;overflow:hidden}
+
 .bg{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:url("https://images.wallpapersden.com/image/download/anime-girl-cyberpunk-neon_bmdtbGaUmZqaraWkpJRmZW1lrWdtbWU.jpg") center/cover no-repeat;
   filter:brightness(.4);
   z-index:0;
 }
+
 #app{position:relative;z-index:1;height:100vh;width:100vw}
 
 .top{
@@ -30,21 +26,40 @@ body{
   font-size:16px;
 }
 
-.tap-zone{
+.energy-core{
   position:absolute;
-  top:50%;
-  left:50%;
+  top:50%;left:50%;
   transform:translate(-50%,-50%);
-  width:220px;
-  height:220px;
-  border-radius:50%;
-  background:radial-gradient(circle,#00ffe7,#003);
+  width:230px;
+  height:230px;
+  clip-path:polygon(
+    50% 0%,
+    93% 25%,
+    93% 75%,
+    50% 100%,
+    7% 75%,
+    7% 25%
+  );
+  background:linear-gradient(135deg,#00fff0,#004dff);
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:26px;
+  font-weight:bold;
+  text-shadow:0 0 15px #00fff0;
+  box-shadow:0 0 40px #00fff099;
   cursor:pointer;
-  user-select:none;
+  animation:pulse 2s infinite;
+}
+
+.energy-core:active{
+  transform:translate(-50%,-50%) scale(.95);
+}
+
+@keyframes pulse{
+  0%{box-shadow:0 0 25px #00fff055}
+  50%{box-shadow:0 0 60px #00fff0cc}
+  100%{box-shadow:0 0 25px #00fff055}
 }
 
 .bottom{
@@ -132,7 +147,7 @@ body{
     <div>⚡ <span id="power">1</span></div>
   </div>
 
-  <div class="tap-zone" onclick="tap()">TAP</div>
+  <div class="energy-core" onclick="tap()">ENERGY</div>
 
   <div class="bottom">
     <div class="btn" onclick="openModal('shop')">🛒 Магазин</div>
@@ -141,30 +156,17 @@ body{
   </div>
 </div>
 
-<!-- МАГАЗИН -->
+<!-- МОДАЛКИ -->
 <div class="modal" id="shop">
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✖</div>
     <h2>🛒 Магазин</h2>
-
-    <div class="shop-item">
-      ⚡ +1 сила — 50 монет
-      <button onclick="buyPower(1,50)">Купить</button>
-    </div>
-
-    <div class="shop-item">
-      ⚡ +5 сила — 200 монет
-      <button onclick="buyPower(5,200)">Купить</button>
-    </div>
-
-    <div class="shop-item">
-      ⏳ x2 доход (5 мин) — 150 монет
-      <button onclick="buyBoost()">Купить</button>
-    </div>
+    <div class="shop-item">⚡ +1 сила — 50 <button onclick="buyPower(1,50)">Купить</button></div>
+    <div class="shop-item">⚡ +5 сила — 200 <button onclick="buyPower(5,200)">Купить</button></div>
+    <div class="shop-item">⏳ x2 (5 мин) — 150 <button onclick="buyBoost()">Купить</button></div>
   </div>
 </div>
 
-<!-- ПРОФИЛЬ -->
 <div class="modal" id="profile">
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✖</div>
@@ -176,7 +178,6 @@ body{
   </div>
 </div>
 
-<!-- ЛИДЕРБОРД -->
 <div class="modal" id="leaderboard">
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✖</div>
@@ -186,18 +187,13 @@ body{
 </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.expand();
+const tg = window.Telegram.WebApp; tg.expand();
 
 let data = JSON.parse(localStorage.getItem("neon")) || {
-  coins:0,
-  power:1,
-  taps:0,
-  boostEnd:0
+  coins:0,power:1,taps:0,boostEnd:0
 };
 
 function save(){localStorage.setItem("neon",JSON.stringify(data))}
-
 function update(){
   coins.innerText=data.coins;
   power.innerText=data.power;
@@ -215,29 +211,13 @@ function tap(){
   save();update();
 }
 
-function buyPower(p,c){
-  if(data.coins>=c){
-    data.coins-=c;
-    data.power+=p;
-    save();update();
-  }
-}
+function buyPower(p,c){if(data.coins>=c){data.coins-=c;data.power+=p;save();update()}}
+function buyBoost(){if(data.coins>=150){data.coins-=150;data.boostEnd=Date.now()+5*60*1000;save();update()}}
 
-function buyBoost(){
-  if(data.coins>=150){
-    data.coins-=150;
-    data.boostEnd=Date.now()+5*60*1000;
-    save();update();
-  }
-}
+function openModal(id){document.getElementById(id).style.display="block"}
+function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
 
-function openModal(id){document.getElementById(id).style.display="block";}
-function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none");}
-
-function acceptPrivacy(){
-  localStorage.setItem("privacy","1");
-  privacy.style.display="none";
-}
+function acceptPrivacy(){localStorage.setItem("privacy","1");privacy.style.display="none"}
 if(localStorage.getItem("privacy")=="1") privacy.style.display="none";
 
 update();
