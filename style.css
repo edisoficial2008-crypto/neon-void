@@ -1,86 +1,36 @@
-* {
-  box-sizing: border-box;
-  touch-action: manipulation;
-}
-
 body {
   margin: 0;
-  background: radial-gradient(circle at top,#0b0030,#000);
+  background: radial-gradient(circle, #050014, #000);
   color: #0ff;
   font-family: Arial, sans-serif;
-}
-
-#app {
-  max-width: 420px;
-  margin: auto;
-  padding: 15px;
   text-align: center;
 }
 
-.stats {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
+#privacy-screen, #game-screen {
+  padding: 20px;
 }
 
-.stats div {
-  width: 30%;
-  background: #12002b;
-  padding: 10px;
-  border-radius: 14px;
+button {
+  padding: 15px 30px;
   font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  background: #00ffff;
+  color: #000;
+  cursor: pointer;
 }
 
-/* КРУГ ТАПА */
-#tapCircle {
-  width: 220px;
-  height: 220px;
-  margin: 20px auto;
+#tap-circle {
+  margin: 40px auto;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  background: radial-gradient(circle,#00ffff,#0055ff);
+  background: radial-gradient(circle, #0ff, #008);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34px;
+  font-size: 32px;
   font-weight: bold;
-  color: black;
+  color: #000;
   user-select: none;
 }
-
-#tapCircle:active {
-  transform: scale(0.95);
-}
-
-.tabs {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.tabs button {
-  width: 32%;
-  padding: 12px;
-  border-radius: 14px;
-  border: none;
-  background: #1a003d;
-  color: #0ff;
-  font-size: 14px;
-}
-
-.panel {
-  display: none;
-  margin-top: 15px;
-  background: #0b001f;
-  padding: 15px;
-  border-radius: 15px;
-}
-
-.panel button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 12px;
-  border: none;
-  background: #00e5ff;
-  color: black;
-  }
