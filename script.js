@@ -7,79 +7,135 @@ let state = JSON.parse(localStorage.getItem("neon_void")) || {
   power: 1,
   taps: 0,
   time: 0,
-  boost: false
+  earned: 0,
+  offline: 0,
+  boost: 1,
+  autoTap: false
 };
 
-const energy = document.getElementById("energy");
-const coins = document.getElementById("coins");
-const power = document.getElementById("power");
-const taps = document.getElementById("taps");
-const time = document.getElementById("time");
+const $ = id => document.getElementById(id);
 
 function save() {
   localStorage.setItem("neon_void", JSON.stringify(state));
 }
 
 function update() {
-  energy.textContent = state.energy;
-  coins.textContent = state.coins;
-  power.textContent = state.power;
-  taps.textContent = state.taps;
-  time.textContent = state.time;
+  $("energy").textContent = state.energy;
+  $("coins").textContent = state.coins;
+  $("power").textContent = state.power;
+  $("taps").textContent = state.taps;
+  $("time").textContent = state.time;
+  $("earned").textContent = state.earned;
+  $("powerLvl").textContent = state.power;
+  $("offline").textContent = state.offline;
 }
 
 /* TAP */
-document.getElementById("tapCircle").addEventListener("click", () => {
-  const gain = state.power * (state.boost ? 2 : 1);
+$("tapCircle").onclick = () => {
+  const gain = state.power * state.boost;
   state.energy += gain;
   state.coins += 1;
-  state.taps += 1;
-  save();
-  update();
-});
+  state.earned += 1;
+  state.taps++;
+  save(); update();
+};
 
 /* МАГАЗИН */
-document.getElementById("buyPower").onclick = () => {
-  if (state.coins >= 20) {
-    state.coins -= 20;
+$("buyPower").onclick = () => {
+  if (state.coins >= 50) {
+    state.coins -= 50;
     state.power += 1;
-    save();
-    update();
+    save(); update();
   }
 };
 
-/* БУСТ */
-document.getElementById("boostBtn").onclick = () => {
-  if (state.coins >= 30 && !state.boost) {
-    state.coins -= 30;
-    state.boost = true;
-    let t = 30;
-    const timer = setInterval(() => {
-      document.getElementById("boostTimer").textContent = `⏳ ${t--} сек`;
-      if (t < 0) {
-        state.boost = false;
-        document.getElementById("boostTimer").textContent = "";
-        clearInterval(timer);
+$("buyPower5").onclick = () => {
+  if (state.coins >= 220) {
+    state.coins -= 220;
+    state.power += 5;
+    save(); update();
+  }
+};
+
+$("buyEnergy").onclick = () => {
+  if (state.coins >= 150) {
+    state.coins -= 150;
+    state.energy += 50;
+    save(); update();
+  }
+};
+
+$("buyOffline").onclick = () => {
+  if (state.coins >= 300) {
+    state.coins -= 300;
+    state.offline += 1;
+    save(); update();
+  }
+};
+
+/* БУСТЫ */
+function activateBoost(mult, sec) {
+  state.boost = mult;
+  let t = sec;
+  const timer = setInterval(() => {
+    $("boostTimer").textContent = `🔥 x${mult} — ${t--} сек`;
+    if (t < 0) {
+      state.boost = 1;
+      $("boostTimer").textContent = "";
+      clearInterval(timer);
+    }
+  }, 1000);
+}
+
+$("boost2x").onclick = () => {
+  if (state.coins >= 100) {
+    state.coins -= 100;
+    activateBoost(2, 30);
+    save(); update();
+  }
+};
+
+$("boost3x").onclick = () => {
+  if (state.coins >= 180) {
+    state.coins -= 180;
+    activateBoost(3, 20);
+    save(); update();
+  }
+};
+
+$("boostAuto").onclick = () => {
+  if (state.coins >= 250 && !state.autoTap) {
+    state.coins -= 250;
+    state.autoTap = true;
+    let t = 20;
+    const auto = setInterval(() => {
+      if (t-- <= 0) {
+        state.autoTap = false;
+        clearInterval(auto);
+      } else {
+        $("tapCircle").click();
       }
-    }, 1000);
-    save();
-    update();
+    }, 500);
+    save(); update();
   }
 };
 
 /* ТАБЫ */
 document.querySelectorAll(".tabs button").forEach(btn => {
-  btn.addEventListener("click", () => {
+  btn.onclick = () => {
     document.querySelectorAll(".panel").forEach(p => p.style.display = "none");
-    document.getElementById(btn.dataset.tab).style.display = "block";
-  });
+    $(btn.dataset.tab).style.display = "block";
+  };
 });
 
-/* ТАЙМЕР */
+/* ПАССИВНЫЙ ДОХОД + ВРЕМЯ */
 setInterval(() => {
   state.time++;
-  save();
-  update();
+  if (state.offline > 0) {
+    state.coins += state.offline;
+    state.earned += state.offline;
+  }
+  save(); update();
 }, 1000);
 
 update();
