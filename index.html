@@ -3,58 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <title>NEON VOID</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <link rel="stylesheet" href="style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 
 <body>
 <div id="app">
 
-  <header>
-    <h1>⚡ NEON VOID</h1>
-    <p class="subtitle">Energy Tap Game</p>
-  </header>
+  <h1>⚡ NEON VOID</h1>
 
-  <section class="stats">
-    <div>⚡ Энергия<br><span id="energy">0</span></div>
-    <div>💎 Кристаллы<br><span id="coins">0</span></div>
-    <div>🚀 Сила<br><span id="power">1</span></div>
-  </section>
+  <div class="stats">
+    <div>⚡<span id="energy">0</span></div>
+    <div>💎<span id="coins">0</span></div>
+    <div>🚀<span id="power">1</span></div>
+  </div>
 
-  <button id="tapBtn">TAP ⚡</button>
+  <button id="tap">TAP</button>
 
-  <section class="menu">
-    <button onclick="openTab('shop')">🛒 Магазин</button>
-    <button onclick="openTab('boost')">🔥 Бусты</button>
-    <button onclick="openTab('profile')">👤 Профиль</button>
-    <button onclick="openTab('settings')">⚙️</button>
-  </section>
+  <div class="tabs">
+    <button data-tab="shop">🛒</button>
+    <button data-tab="boost">🔥</button>
+    <button data-tab="profile">👤</button>
+  </div>
 
-  <section id="shop" class="panel">
-    <h2>🛒 Магазин</h2>
-    <button onclick="buyPower()">➕ Сила (+1) — 20💎</button>
-    <button onclick="buyOffline()">🕒 Оффлайн доход — 50💎</button>
-  </section>
+  <div id="shop" class="panel">
+    <button id="buyPower">+1 сила (20💎)</button>
+  </div>
 
-  <section id="boost" class="panel">
-    <h2>🔥 Бусты</h2>
-    <button onclick="activateBoost()">x2 TAP (30 сек) — 30💎</button>
+  <div id="boost" class="panel">
+    <button id="boostBtn">x2 на 30 сек (30💎)</button>
     <p id="boostTimer"></p>
-  </section>
+  </div>
 
-  <section id="profile" class="panel">
-    <h2>👤 Профиль</h2>
-    <p>Всего тапов: <span id="taps">0</span></p>
-    <p>Время в игре: <span id="time">0</span> сек</p>
-  </section>
-
-  <section id="settings" class="panel">
-    <h2>⚙️ Настройки</h2>
-    <button onclick="resetGame()">♻️ Сброс</button>
-  </section>
+  <div id="profile" class="panel">
+    <p>Тапы: <span id="taps">0</span></p>
+    <p>Время: <span id="time">0</span> сек</p>
+  </div>
 
 </div>
 
 <script src="script.js"></script>
 </body>
-  </html>
+</html>
