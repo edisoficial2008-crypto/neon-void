@@ -2,3 +2,7 @@ fastapi
 uvicorn
 gunicorn
 pydantic
+fastapi
+uvicorn
+aiogram
+requests
