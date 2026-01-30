@@ -49,11 +49,15 @@ function buyTemp(mult,price,sec){
 }
 
 function openTab(id){
+  closePanels();
+  document.getElementById(id).classList.remove("hidden");
+  update();
+}
+
+function closePanels(){
   ["shop","profile","leader"].forEach(p=>{
     document.getElementById(p).classList.add("hidden");
   });
-  document.getElementById(id).classList.remove("hidden");
-  update();
 }
 
 function update(){
