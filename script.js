@@ -1,6 +1,5 @@
 let coins = 0;
 
-// Проверка согласия
 window.onload = () => {
   const accepted = localStorage.getItem("privacyAccepted");
 
@@ -12,13 +11,13 @@ window.onload = () => {
 };
 
 function showPrivacy() {
-  document.getElementById("privacy-screen").style.display = "block";
+  document.getElementById("privacy-screen").style.display = "flex";
   document.getElementById("game-screen").style.display = "none";
 }
 
 function showGame() {
   document.getElementById("privacy-screen").style.display = "none";
-  document.getElementById("game-screen").style.display = "block";
+  document.getElementById("game-screen").style.display = "flex";
 }
 
 function acceptPrivacy() {
@@ -26,7 +25,6 @@ function acceptPrivacy() {
   showGame();
 }
 
-// ТАП
 function tap() {
   coins += 1;
   document.getElementById("coins").innerText = "Монеты: " + coins;
