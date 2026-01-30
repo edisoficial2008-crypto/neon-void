@@ -2,249 +2,254 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Anime Tap</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Anime Tap</title>
 
 <style>
-*{box-sizing:border-box;font-family:Arial}
-body{margin:0;overflow:hidden;background:#12001f;color:#fff}
-
-/* ===== ФОН ===== */
-.bg{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at top,#4b006e,#12001f 70%);
-  z-index:0;
+* {margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body {
+  background: radial-gradient(circle at center, #5a007a, #120016);
+  color: white;
+  overflow: hidden;
 }
 
-/* ===== ЧАСТИЦЫ ===== */
-.particle{
-  position:absolute;
-  width:6px;
-  height:6px;
-  background:#ff7bff;
-  border-radius:50%;
-  opacity:.6;
-  animation:float linear infinite;
+/* ===== PARTIKLES ===== */
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
 }
 
-@keyframes float{
-  from{transform:translateY(110vh)}
-  to{transform:translateY(-10vh)}
+/* ===== TOP ===== */
+.top {
+  text-align:center;
+  padding:20px;
+}
+.score {
+  font-size:20px;
+  margin-top:5px;
 }
 
-/* ===== ОСНОВА ===== */
-#app{
-  position:relative;
-  z-index:2;
-  height:100vh;
-}
-
-/* ===== ВЕРХ ===== */
-.top{
+/* ===== TAP BUTTON ===== */
+.tap-wrapper {
   display:flex;
-  justify-content:space-between;
-  padding:14px 18px;
-  font-size:18px;
-}
-
-/* ===== ТАП КРУГ ===== */
-.tap-core{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:240px;
-  height:240px;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at top,#ff6bff,#6a00a8);
-  display:flex;
-  align-items:center;
   justify-content:center;
-  font-size:28px;
-  font-weight:bold;
-  text-shadow:0 0 12px #fff;
-  box-shadow:
-    0 0 40px #ff6bffaa,
-    inset 0 0 30px #ffffff33;
-  animation:pulse 2s infinite;
+  align-items:center;
+  height:60vh;
 }
-
-.tap-core:active{
-  transform:translate(-50%,-50%) scale(.95);
+.tap {
+  width:230px;
+  height:230px;
+  border-radius:50%;
+  background: radial-gradient(circle, #ff00ff, #7a008a);
+  box-shadow: 0 0 60px #ff00ff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:42px;
+  cursor:pointer;
+  user-select:none;
+  transition:transform .05s;
 }
+.tap:active { transform: scale(0.95); }
 
-@keyframes pulse{
-  0%{box-shadow:0 0 25px #ff6bff66}
-  50%{box-shadow:0 0 60px #ff6bffff}
-  100%{box-shadow:0 0 25px #ff6bff66}
-}
-
-/* ===== НИЗ ===== */
-.bottom{
-  position:absolute;
-  bottom:14px;
+/* ===== MENU ===== */
+.menu {
+  position:fixed;
+  bottom:0;
   width:100%;
   display:flex;
   justify-content:space-around;
+  background:#000000aa;
+  padding:10px 0;
 }
-
-.btn{
-  background:rgba(0,0,0,.55);
-  padding:12px 20px;
-  border-radius:16px;
-  backdrop-filter:blur(6px);
-}
-
-/* ===== МОДАЛКИ ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.85);
-  display:none;
-  z-index:5;
-}
-
-.modal-content{
-  background:#1b002b;
-  margin:40px 18px;
-  padding:20px;
-  border-radius:18px;
-}
-
-.close{
-  position:absolute;
-  right:18px;
-  top:10px;
-  font-size:22px;
-}
-
-.item{
-  background:#2b0042;
-  margin:12px 0;
-  padding:14px;
-  border-radius:14px;
-}
-
-/* ===== КОНФИДЕНЦ ===== */
-.privacy{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.9);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-}
-
-.privacy-box{
-  background:#1b002b;
-  padding:26px;
-  border-radius:18px;
-  text-align:center;
-}
-
-button{
-  margin-top:14px;
-  padding:10px 22px;
-  border-radius:14px;
+.menu button {
+  background:none;
   border:none;
+  color:white;
+  font-size:18px;
+}
+
+/* ===== MODAL ===== */
+.modal {
+  position:fixed;
+  inset:0;
+  background:#000000dd;
+  display:none;
+  padding:20px;
+  overflow:auto;
+}
+.modal h2 { text-align:center; margin-bottom:15px; }
+.close {
+  position:absolute;
+  top:15px;
+  right:20px;
+  font-size:30px;
+  cursor:pointer;
+}
+
+/* ===== SHOP ITEMS ===== */
+.item {
+  background:#1a0025;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+.item button {
+  margin-top:5px;
+  width:100%;
+  padding:8px;
+  background:#ff00ff;
+  border:none;
+  color:white;
+  border-radius:8px;
 }
 </style>
 </head>
 
 <body>
-<div class="bg"></div>
 
-<!-- ЧАСТИЦЫ -->
-<script>
-for(let i=0;i<40;i++){
-  let p=document.createElement("div");
-  p.className="particle";
-  p.style.left=Math.random()*100+"vw";
-  p.style.animationDuration=(5+Math.random()*10)+"s";
-  p.style.opacity=Math.random();
-  document.body.appendChild(p);
-}
-</script>
+<canvas id="bg"></canvas>
 
-<!-- КОНФИДЕНЦ -->
-<div class="privacy" id="privacy">
-  <div class="privacy-box">
-    <h2>🔒 Конфиденциальность</h2>
-    <p>Прогресс сохраняется</p>
-    <button onclick="accept()">Принять</button>
-  </div>
+<div class="top">
+  <h1>Anime Tap</h1>
+  <div class="score">Очки: <span id="score">0</span></div>
 </div>
 
-<div id="app">
-  <div class="top">
-    <div>💰 <span id="coins">0</span></div>
-    <div>⚡ <span id="power">1</span></div>
-  </div>
-
-  <div class="tap-core" onclick="tap()">TAP</div>
-
-  <div class="bottom">
-    <div class="btn" onclick="openM('shop')">🛒</div>
-    <div class="btn" onclick="openM('profile')">👤</div>
-    <div class="btn" onclick="openM('lead')">🏆</div>
-  </div>
+<div class="tap-wrapper">
+  <div class="tap" id="tap">TAP</div>
 </div>
 
-<div class="modal" id="shop">
-  <div class="modal-content">
-    <div class="close" onclick="closeM()">✖</div>
-    <h2>Магазин</h2>
-    <div class="item">+1 сила — 50 <button onclick="buy(1,50)">Купить</button></div>
-    <div class="item">x2 (5 мин) — 150 <button onclick="boost()">Купить</button></div>
-  </div>
+<div class="menu">
+  <button onclick="openModal('profile')">👤</button>
+  <button onclick="openModal('shop')">🛒</button>
+  <button onclick="openModal('leader')">🏆</button>
 </div>
 
+<!-- PROFILE -->
 <div class="modal" id="profile">
-  <div class="modal-content">
-    <div class="close" onclick="closeM()">✖</div>
-    <h2>Профиль</h2>
-    <p>Тапов: <span id="taps"></span></p>
-    <p>Сила: <span id="pp"></span></p>
-    <p>Монеты: <span id="pc"></span></p>
-  </div>
+  <div class="close" onclick="closeModal()">✖</div>
+  <h2>Профиль</h2>
+  <p>Очки: <span id="pScore"></span></p>
+  <p>Сила тапа: <span id="pPower"></span></p>
+  <p>Авто-тап: <span id="pAuto"></span></p>
 </div>
 
-<div class="modal" id="lead">
-  <div class="modal-content">
-    <div class="close" onclick="closeM()">✖</div>
-    <h2>Лидерборд</h2>
-    <p>Ты: <span id="lc"></span> 💰</p>
+<!-- SHOP -->
+<div class="modal" id="shop">
+  <div class="close" onclick="closeModal()">✖</div>
+  <h2>Магазин</h2>
+
+  <div class="item">
+    <b>+1 к тапу</b><br>Цена: 10
+    <button onclick="buyPower()">Купить</button>
   </div>
+
+  <div class="item">
+    <b>Авто-тап</b><br>+1/сек<br>Цена: 50
+    <button onclick="buyAuto()">Купить</button>
+  </div>
+
+  <div class="item">
+    <b>x2 доход (30 сек)</b><br>Цена: 100
+    <button onclick="buyBoost()">Купить</button>
+  </div>
+
+</div>
+
+<!-- LEADER -->
+<div class="modal" id="leader">
+  <div class="close" onclick="closeModal()">✖</div>
+  <h2>Лидерборд</h2>
+  <p>Скоро онлайн рейтинг 👀</p>
 </div>
 
 <script>
-const tg=window.Telegram.WebApp; tg.expand();
-let d=JSON.parse(localStorage.getItem("animeTap"))||{c:0,p:1,t:0,b:0};
-function save(){localStorage.setItem("animeTap",JSON.stringify(d))}
-function upd(){
-  coins.innerText=d.c;
-  power.innerText=d.p;
-  taps.innerText=d.t;
-  pp.innerText=d.p;
-  pc.innerText=d.c;
-  lc.innerText=d.c;
+let score = Number(localStorage.score || 0)
+let power = Number(localStorage.power || 1)
+let auto = Number(localStorage.auto || 0)
+let boost = 1
+
+const scoreEl = document.getElementById("score")
+scoreEl.textContent = score
+
+tap.onclick = () => {
+  score += power * boost
+  save()
 }
-function tap(){
-  let m=Date.now()<d.b?2:1;
-  d.c+=d.p*m; d.t++; save(); upd();
+
+setInterval(() => {
+  score += auto * boost
+  save()
+}, 1000)
+
+function buyPower(){
+  if(score>=10){
+    score-=10
+    power++
+    save()
+  }
 }
-function buy(p,c){if(d.c>=c){d.c-=c;d.p+=p;save();upd()}}
-function boost(){if(d.c>=150){d.c-=150;d.b=Date.now()+300000;save();upd()}}
-function openM(id){document.getElementById(id).style.display="block"}
-function closeM(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
-function accept(){localStorage.setItem("ok","1");privacy.style.display="none"}
-if(localStorage.getItem("ok"))privacy.style.display="none";
-upd();
+function buyAuto(){
+  if(score>=50){
+    score-=50
+    auto++
+    save()
+  }
+}
+function buyBoost(){
+  if(score>=100){
+    score-=100
+    boost=2
+    setTimeout(()=>boost=1,30000)
+    save()
+  }
+}
+
+function save(){
+  localStorage.score=score
+  localStorage.power=power
+  localStorage.auto=auto
+  scoreEl.textContent=score
+}
+
+function openModal(id){
+  document.getElementById(id).style.display="block"
+  pScore.textContent=score
+  pPower.textContent=power
+  pAuto.textContent=auto
+}
+function closeModal(){
+  document.querySelectorAll(".modal").forEach(m=>m.style.display="none")
+}
+
+/* ===== PARTICLES ===== */
+const c = document.getElementById("bg")
+const ctx = c.getContext("2d")
+function resize(){ c.width=innerWidth; c.height=innerHeight }
+resize(); addEventListener("resize",resize)
+
+let particles = Array.from({length:80},()=>({
+  x:Math.random()*c.width,
+  y:Math.random()*c.height,
+  r:Math.random()*2+1,
+  v:Math.random()*0.5+0.2
+}))
+
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height)
+  particles.forEach(p=>{
+    p.y+=p.v
+    if(p.y>c.height) p.y=0
+    ctx.beginPath()
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+    ctx.fillStyle="#ff00ff"
+    ctx.fill()
+  })
+  requestAnimationFrame(draw)
+}
+draw()
 </script>
+
 </body>
 </html>
