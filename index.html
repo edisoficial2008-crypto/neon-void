@@ -1,70 +1,28 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>NEON VOID</title>
+  <meta charset="UTF-8" />
+  <title>Neon Void</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Telegram SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url("https://i.imgur.com/6QJYH6v.jpg") no-repeat center/cover;
-      color: white;
-      text-align: center;
-    }
-
-    .container {
-      backdrop-filter: blur(6px);
-      background: rgba(0,0,0,0.6);
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    button {
-      padding: 15px 25px;
-      font-size: 18px;
-      margin: 10px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .tap {
-      background: #00ffd5;
-    }
-
-    .shop {
-      background: #ff00aa;
-      color: white;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<div id="app">
   <h1>⚡ NEON VOID</h1>
-  <p id="energy">Энергия: 0</p>
 
-  <button class="tap" onclick="tap()">🔋 TAP</button>
-  <br>
-  <button class="shop" onclick="alert('Скоро')">🛒 Магазин</button>
+  <div class="stats">
+    <div>Энергия: <span id="energy">0</span></div>
+    <div>Кристаллы: <span id="coins">0</span></div>
+  </div>
+
+  <button id="tap">⚡ TAP</button>
+
+  <div class="shop">
+    <button onclick="buyUpgrade()">🚀 Улучшить (+1)</button>
+  </div>
 </div>
 
-<script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
-
-  let energy = 0;
-
-  function tap() {
-    energy++;
-    document.getElementById("energy").innerText = "Энергия: " + energy;
-  }
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
