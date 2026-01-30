@@ -18,11 +18,11 @@ body {
   overflow: hidden;
 }
 
-/* ===== TOP ===== */
+/* ===== HEADER ===== */
 .header {
   padding: 14px;
   text-align: center;
-  background: rgba(0,0,0,.4);
+  background: rgba(0,0,0,.45);
 }
 
 .stats {
@@ -43,30 +43,34 @@ body {
 .nav button {
   background: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 10px 16px;
+  border-radius: 14px;
+  padding: 10px 18px;
   font-size: 16px;
   cursor: pointer;
 }
 
-/* ===== TAP ===== */
+/* ===== TAP ZONE (БЕЗ ФОНА!) ===== */
 .tap-zone {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 200px);
+  background: transparent !important;
 }
 
+/* ===== TAP CIRCLE ===== */
 .tap-circle {
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  background: radial-gradient(circle, #3cf2ff, #0066ff);
+  background: radial-gradient(circle at 30% 30%, #5ff6ff, #007bff);
   box-shadow:
-    0 0 40px #3cf2ff,
-    0 0 90px rgba(0,150,255,.8);
-  transition: transform .07s;
+    0 0 30px rgba(80,200,255,.9),
+    0 0 80px rgba(0,120,255,.9);
   cursor: pointer;
+  transition: transform .08s ease;
 }
 
 .tap-circle:active {
@@ -76,8 +80,9 @@ body {
 /* ===== FLOAT NUMBERS ===== */
 .float {
   position: absolute;
-  color: #6ff;
+  color: #8ff;
   font-size: 22px;
+  font-weight: 600;
   animation: float 1s ease-out forwards;
   pointer-events: none;
 }
@@ -91,7 +96,7 @@ body {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.85);
+  background: rgba(0,0,0,.88);
   display: none;
   padding: 20px;
   overflow-y: auto;
@@ -112,15 +117,15 @@ body {
 .shop-item {
   background: rgba(255,255,255,.08);
   padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  border-radius: 14px;
+  margin-bottom: 12px;
 }
 
 .shop-item button {
-  margin-top: 6px;
+  margin-top: 8px;
   width: 100%;
-  padding: 8px;
-  border-radius: 10px;
+  padding: 10px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
 }
@@ -189,22 +194,7 @@ body {
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✕</div>
     <h2>Лидерборд</h2>
-    <p>Скоро онлайн топ</p>
-  </div>
-</div>
-
-<!-- ===== PRIVACY ===== -->
-<div class="modal" id="privacy">
-  <div class="modal-content">
-    <div class="close" onclick="closeModal()">✕</div>
-    <h2>Политика конфиденциальности</h2>
-    <p>
-Мы не собираем персональные данные, кроме Telegram ID.
-Данные используются исключительно для игрового прогресса.
-Мы не передаём информацию третьим лицам.
-Все данные могут быть удалены по запросу.
-Используя игру, вы соглашаетесь с условиями.
-    </p>
+    <p>Скоро онлайн</p>
   </div>
 </div>
 
@@ -274,4 +264,4 @@ update();
 </script>
 
 </body>
-</html>
+    </html>
