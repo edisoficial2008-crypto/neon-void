@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  background: #05010d;
+  color: #00f6ff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+#app {
+  padding: 20px;
+}
+
+button {
+  background: linear-gradient(90deg, #00f6ff, #7f00ff);
+  border: none;
+  padding: 15px 25px;
+  margin: 10px;
+  color: black;
+  font-size: 18px;
+  border-radius: 12px;
+}
+
+.stats {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
