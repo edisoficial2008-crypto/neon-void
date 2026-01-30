@@ -1,80 +1,77 @@
-let state = {
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+let state = JSON.parse(localStorage.getItem("neon_void")) || {
   energy: 0,
   coins: 0,
   power: 1,
   taps: 0,
-  playTime: 0,
-  offline: 0,
+  time: 0,
   boost: false
 };
 
-function load() {
-  const s = localStorage.getItem("neonVoid");
-  if (s) state = JSON.parse(s);
-  updateUI();
-}
+const energy = document.getElementById("energy");
+const coins = document.getElementById("coins");
+const power = document.getElementById("power");
+const taps = document.getElementById("taps");
+const time = document.getElementById("time");
+const tapBtn = document.getElementById("tap");
+
 function save() {
-  localStorage.setItem("neonVoid", JSON.stringify(state));
+  localStorage.setItem("neon_void", JSON.stringify(state));
 }
 
-document.getElementById("tapBtn").onclick = () => {
-  let gain = state.power * (state.boost ? 2 : 1);
-  state.energy += gain;
-  state.coins += 1;
-  state.taps++;
-  save();
-  updateUI();
-};
-
-function buyPower() {
-  if (state.coins >= 20) {
-    state.coins -= 20;
-    state.power++;
-    save(); updateUI();
-  }
-}
-
-function buyOffline() {
-  if (state.coins >= 50) {
-    state.coins -= 50;
-    state.offline += 1;
-    save(); updateUI();
-  }
-}
-
-function activateBoost() {
-  if (state.coins >= 30 && !state.boost) {
-    state.coins -= 30;
-    state.boost = true;
-    setTimeout(() => state.boost = false, 30000);
-    save(); updateUI();
-  }
-}
-
-function openTab(id) {
-  document.querySelectorAll(".panel").forEach(p => p.style.display = "none");
-  document.getElementById(id).style.display = "block";
-}
-
-function resetGame() {
-  localStorage.clear();
-  location.reload();
-}
-
-function updateUI() {
+function update() {
   energy.textContent = state.energy;
   coins.textContent = state.coins;
   power.textContent = state.power;
   taps.textContent = state.taps;
-  time.textContent = state.playTime;
+  time.textContent = state.time;
 }
 
-setInterval(() => {
-  state.playTime++;
-  if (state.offline > 0) {
-    state.coins += state.offline;
+tapBtn.addEventListener("click", () => {
+  const gain = state.power * (state.boost ? 2 : 1);
+  state.energy += gain;
+  state.coins += 1;
+  state.taps += 1;
+  save(); update();
+});
+
+document.getElementById("buyPower").onclick = () => {
+  if (state.coins >= 20) {
+    state.coins -= 20;
+    state.power += 1;
+    save(); update();
   }
-  save(); updateUI();
+};
+
+document.getElementById("boostBtn").onclick = () => {
+  if (state.coins >= 30 && !state.boost) {
+    state.coins -= 30;
+    state.boost = true;
+    let t = 30;
+    const timer = setInterval(() => {
+      document.getElementById("boostTimer").textContent = `⏳ ${t--}`;
+      if (t < 0) {
+        state.boost = false;
+        document.getElementById("boostTimer").textContent = "";
+        clearInterval(timer);
+      }
+    }, 1000);
+    save(); update();
+  }
+};
+
+document.querySelectorAll(".tabs button").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".panel").forEach(p => p.style.display = "none");
+    document.getElementById(btn.dataset.tab).style.display = "block";
+  };
+});
+
+setInterval(() => {
+  state.time++;
+  save(); update();
 }, 1000);
 
-load();
+update();
