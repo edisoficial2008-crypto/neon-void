@@ -5,55 +5,61 @@
   font-family: Arial, sans-serif;
 }
 
-body {
-  background: radial-gradient(circle, #5b0f8c, #120018);
-  height: 100vh;
-  overflow: hidden;
-  color: white;
-}
-
-/* ШАПКА */
-.header {
-  text-align: center;
-  padding: 20px;
-}
-
-.header h1 {
-  font-size: 32px;
-  letter-spacing: 2px;
-}
-
-/* ТАП ЗОНА */
-#tapZone {
+html, body {
   width: 100%;
-  height: calc(100vh - 140px);
+  height: 100%;
+  background: radial-gradient(circle at top, #2b0036, #050008);
+  color: white;
+  overflow: hidden;
 }
 
-/* ЦИФРЫ ПРИ ТАПЕ */
+/* HEADER */
+.header {
+  padding: 15px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.stats {
+  opacity: 0.8;
+}
+
+/* TAP ZONE */
+#tapZone {
+  position: absolute;
+  top: 90px;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+}
+
+/* TAP NUMBERS */
 .tap-number {
   position: absolute;
-  color: #baffff;
-  font-size: 22px;
-  animation: floatUp 1s forwards;
+  font-size: 20px;
+  color: #8ffcff;
   pointer-events: none;
+  animation: fly 1s forwards;
 }
 
-@keyframes floatUp {
+@keyframes fly {
   from { opacity: 1; transform: translateY(0); }
   to { opacity: 0; transform: translateY(-40px); }
 }
 
-/* НИЖНЕЕ МЕНЮ */
+/* BOTTOM MENU */
 .bottom-menu {
   position: fixed;
   bottom: 0;
   width: 100%;
-  height: 60px;
-  background: rgba(0,0,0,0.6);
+  height: 70px;
+  background: rgba(0,0,0,0.85);
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 10;
 }
 
 .bottom-menu button {
@@ -62,3 +68,29 @@ body {
   font-size: 24px;
   color: white;
 }
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+  width: 80%;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  }
