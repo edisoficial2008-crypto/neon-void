@@ -6,38 +6,78 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: radial-gradient(circle at center, #8f00ff, #120018);
+  background:
+    radial-gradient(circle at 30% 20%, #6a00ff44, transparent 40%),
+    radial-gradient(circle at 70% 80%, #ff00ff33, transparent 45%),
+    linear-gradient(180deg, #0b0015, #1a0033);
   color: white;
+  height: 100vh;
   overflow: hidden;
 }
 
 header {
   text-align: center;
-  padding: 10px;
-  font-size: 24px;
+  padding-top: 12px;
+  font-size: 26px;
   font-weight: bold;
 }
 
 #score {
   text-align: center;
   opacity: 0.8;
+  margin-top: 4px;
 }
 
 #tapArea {
-  width: 200px;
-  height: 200px;
-  margin: 60px auto;
+  width: 220px;
+  height: 220px;
+  margin: 80px auto;
   border-radius: 50%;
   background: radial-gradient(circle, #ff4bff, #7a00cc);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 34px;
   cursor: pointer;
-  box-shadow: 0 0 40px #ff4bff;
+  box-shadow: 0 0 50px #ff4bff;
+  position: relative;
+  user-select: none;
+}
+
+#tapArea:active {
+  transform: scale(0.95);
+}
+
+.effect {
+  position: absolute;
+  color: #fff;
+  font-size: 20px;
+  animation: floatUp 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-60px); }
+}
+
+.ripple {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  animation: ripple 0.6s ease-out forwards;
+}
+
+@keyframes ripple {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(8); opacity: 0; }
 }
 
 nav {
@@ -45,12 +85,12 @@ nav {
   bottom: 0;
   width: 100%;
   display: flex;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.7);
 }
 
 nav button {
   flex: 1;
-  padding: 15px;
+  padding: 14px;
   font-size: 16px;
   background: none;
   color: white;
@@ -67,10 +107,10 @@ nav button {
 }
 
 .item {
-  margin: 10px 0;
-  padding: 10px;
+  margin: 12px 0;
+  padding: 12px;
   background: rgba(255,255,255,0.1);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 </style>
 </head>
@@ -115,6 +155,7 @@ let points = parseInt(localStorage.getItem("points")) || 0;
 let power = parseInt(localStorage.getItem("power")) || 1;
 
 const pointsEl = document.getElementById("points");
+const tapArea = document.getElementById("tapArea");
 
 function save() {
   localStorage.setItem("points", points);
@@ -127,28 +168,42 @@ function updateUI() {
   document.getElementById("tapPower").textContent = power;
 }
 
-document.getElementById("tapArea").onclick = () => {
+tapArea.onclick = (e) => {
   points += power;
   save();
   updateUI();
+
+  // +число
+  const text = document.createElement("div");
+  text.className = "effect";
+  text.textContent = "+" + power;
+  text.style.left = "50%";
+  text.style.top = "50%";
+  tapArea.appendChild(text);
+  setTimeout(() => text.remove(), 1000);
+
+  // рябь
+  const ripple = document.createElement("div");
+  ripple.className = "ripple";
+  ripple.style.left = e.offsetX + "px";
+  ripple.style.top = e.offsetY + "px";
+  tapArea.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
 };
 
 function buyUpgrade() {
   if (points >= 50) {
     points -= 50;
-    power += 1;
+    power++;
     save();
     updateUI();
     alert("Апгрейд куплен!");
-  } else {
-    alert("Не хватает очков");
-  }
+  } else alert("Не хватает очков");
 }
 
 function openScreen(name) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(name).classList.add("active");
-
   if (name === "leaderboard") loadLeaders();
 }
 
@@ -173,4 +228,4 @@ updateUI();
 </script>
 
 </body>
-  </html>
+</html>
