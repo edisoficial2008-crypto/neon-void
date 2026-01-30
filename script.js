@@ -1,15 +1,21 @@
-const tg = window.Telegram.WebApp;
-tg.expand();
+let score = 0;
+let boost = 1;
 
-const userId = tg.initDataUnsafe.user.id;
-const coinsEl = document.getElementById("coins");
+const scoreEl = document.getElementById("score");
+const tapBtn = document.getElementById("tap");
 
-document.getElementById("tap").onclick = async () => {
-    const res = await fetch("https://YOUR_SERVER_URL/tap", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({user_id: userId})
-    });
-    const data = await res.json();
-    coinsEl.innerText = data.coins;
-};
+tapBtn.addEventListener("click", () => {
+  score += boost;
+  scoreEl.textContent = score;
+});
+
+function buyBoost() {
+  if (score >= 10) {
+    score -= 10;
+    boost = 2;
+    scoreEl.textContent = score;
+    alert("Буст x2 активирован!");
+  } else {
+    alert("Не хватает очков");
+  }
+}
