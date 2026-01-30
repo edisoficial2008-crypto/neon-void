@@ -1,14 +1,20 @@
-from flask import Flask, jsonify
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/")
-def home():
-    return "NEON VOID SERVER LIVE"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.route("/tap", methods=["POST"])
-def tap():
-    return jsonify({"status": "ok", "reward": 1})
+@app.post("/save")
+async def save_game(data: dict):
+    print("SAVE:", data)
+    return {"status": "ok"}
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+@app.get("/")
+def root():
+    return {"Neon Void": "Backend Online"}
