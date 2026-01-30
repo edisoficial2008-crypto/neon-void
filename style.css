@@ -1,45 +1,20 @@
-* {
+body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  background: #0b0b0f;
+  color: #00ffff;
   font-family: Arial, sans-serif;
 }
 
-body {
-  background: radial-gradient(circle, #0f2027, #203a43, #2c5364);
-  color: white;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#app {
+.container {
   text-align: center;
+  margin-top: 40%;
 }
 
-h1 {
-  margin-bottom: 20px;
-}
-
-#score {
-  font-size: 48px;
-  margin: 20px 0;
-}
-
-#tap {
-  font-size: 24px;
+button {
+  font-size: 32px;
   padding: 20px 40px;
+  background: #00ffff;
+  color: #000;
   border: none;
   border-radius: 12px;
-  background: #00ffd5;
-  cursor: pointer;
-}
-
-#tap:active {
-  transform: scale(0.95);
-}
-
-.shop {
-  margin-top: 30px;
 }
