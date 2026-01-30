@@ -1,82 +1,148 @@
-<!DOCTYPE html><html lang="ru">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON VOID — Energy Game</title>
+<title>NEON VOID</title>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Comic Sans MS',cursive;}
-body{height:100vh;overflow:hidden;color:#fff;background:radial-gradient(circle at center,#7a00ff 0%,#2a0033 60%,#120016 100%);} header{text-align:center;padding:12px 0;} header h1{font-size:26px;letter-spacing:2px;} header p{opacity:.7;}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-/* TAP */ #tap-area{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);} #tap-btn{ width:220px;height:220px;border-radius:50%; background:radial-gradient(circle,#ff7bff,#6a00cc); box-shadow:0 0 60px #ff4dff; display:flex;align-items:center;justify-content:center; font-size:36px;cursor:pointer;user-select:none; } #tap-btn:active{transform:scale(.95);}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
 
-/* EFFECTS */ .effect{position:absolute;border-radius:50%;border:2px solid #ff7bff;animation:boom .7s ease-out forwards;pointer-events:none;} @keyframes boom{from{width:0;height:0;opacity:1;}to{width:260px;height:260px;opacity:0;}}
+body {
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at center, #6a00ff 0%, #1a001f 70%);
+  height: 100vh;
+  color: white;
+  overflow: hidden;
+}
 
-/* PANELS */ .panel{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,0,20,.95);display:none;padding:20px;} .panel.active{display:block;} .close{position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;}
+header {
+  text-align: center;
+  padding: 20px 10px 10px;
+}
 
-/* NAV */ nav{position:absolute;bottom:0;left:0;width:100%;display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.4);} nav div{opacity:.7;cursor:pointer;} nav div.active{opacity:1;}
+header h1 {
+  font-weight: 700;
+  letter-spacing: 2px;
+}
 
-button{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;}
+header p {
+  opacity: 0.85;
+  margin-top: 6px;
+}
 
+#tap-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #c700ff 0%, #6a00ff 60%, transparent 70%);
+  box-shadow: 0 0 80px #b000ff;
+}
+
+#tap-area:active {
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.tap-number {
+  position: absolute;
+  font-weight: 700;
+  font-size: 20px;
+  color: #ffffff;
+  pointer-events: none;
+  animation: floatUp 0.9s ease-out forwards;
+}
+
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+
+/* Нижнее меню */
+nav {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  backdrop-filter: blur(8px);
+}
+
+nav span {
+  opacity: 0.7;
+  font-size: 14px;
+}
 </style>
 </head>
+
 <body>
+
 <header>
   <h1>NEON VOID</h1>
-  <p>Очки: <span id="score">0</span> | Энергия: <span id="energy">4000</span>/4000</p>
-</header><div id="tap-area">
-  <div id="tap-btn">TAP</div>
-</div><!-- SHOP --><div id="shop" class="panel">
-  <div class="close" onclick="closePanels()">✖</div>
-  <h2>🛒 Магазин</h2><br>
-  <div>+1 за тап — 50 очков <button onclick="buyTap()">Купить</button></div><br>
-  <div>Авто-тап (30 мин) — 300 <button onclick="buyAuto()">Купить</button></div>
-</div><!-- PROFILE --><div id="profile" class="panel">
-  <div class="close" onclick="closePanels()">✖</div>
-  <h2>👤 Профиль</h2><br>
-  <p>Очки: <span id="pScore">0</span></p>
-  <p>Сила тапа: <span id="pTap">1</span></p>
-  <p>Всего тапов: <span id="pTaps">0</span></p>
-</div><!-- LEADER --><div id="leader" class="panel">
-  <div class="close" onclick="closePanels()">✖</div>
-  <h2>🏆 Лидерборд</h2><br>
-  <p>1. Ты — <span id="lScore">0</span></p>
-</div><nav>
-  <div onclick="openPanel('shop')">🛒</div>
-  <div onclick="openPanel('profile')">👤</div>
-  <div onclick="openPanel('leader')">🏆</div>
-</nav><script>
-let score=0, tapPower=1, energy=4000, taps=0;
+  <p>
+    Очки: <span id="score">0</span> |
+    Энергия: <span id="energy">4000</span>/4000
+  </p>
+</header>
 
-function update(){
-  score+=tapPower; taps++; energy--;
-  document.getElementById('score').textContent=score;
-  document.getElementById('energy').textContent=energy;
-  document.getElementById('pScore').textContent=score;
-  document.getElementById('pTap').textContent=tapPower;
-  document.getElementById('pTaps').textContent=taps;
-  document.getElementById('lScore').textContent=score;
-}
+<div id="tap-area"></div>
 
-const tapBtn=document.getElementById('tap-btn');
+<nav>
+  <span>🎮 Игра</span>
+  <span>🛒 Магазин</span>
+  <span>👤 Профиль</span>
+  <span>🏆 Топ</span>
+</nav>
 
-tapBtn.onclick=(e)=>{
-  if(energy<=0) return;
-  update();
-  const ef=document.createElement('div');
-  ef.className='effect';
-  ef.style.left=e.clientX-130+'px';
-  ef.style.top=e.clientY-130+'px';
-  document.body.appendChild(ef);
-  setTimeout(()=>ef.remove(),700);
-}
+<script>
+let score = 0;
+let energy = 4000;
+const maxEnergy = 4000;
 
-function buyTap(){if(score>=50){score-=50;tapPower++;}}
-function buyAuto(){alert('Автотап в разработке');}
+const scoreEl = document.getElementById('score');
+const energyEl = document.getElementById('energy');
+const tapArea = document.getElementById('tap-area');
 
-function openPanel(id){closePanels();document.getElementById(id).classList.add('active');}
-function closePanels(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));}
+// восстановление энергии
+setInterval(() => {
+  if (energy < maxEnergy) {
+    energy++;
+    energyEl.textContent = energy;
+  }
+}, 450); // ~30 минут до фулла
 
-// ENERGY REGEN
-setInterval(()=>{if(energy<4000) energy+=Math.ceil(4000/1800);},1000);
-</script></body>
+tapArea.addEventListener('click', (e) => {
+  if (energy <= 0) return;
+
+  energy--;
+  score++;
+
+  scoreEl.textContent = score;
+  energyEl.textContent = energy;
+
+  const num = document.createElement('div');
+  num.className = 'tap-number';
+  num.textContent = '+1';
+  num.style.left = e.clientX + 'px';
+  num.style.top = e.clientY + 'px';
+  document.body.appendChild(num);
+
+  setTimeout(() => num.remove(), 900);
+});
+</script>
+
+</body>
 </html>
