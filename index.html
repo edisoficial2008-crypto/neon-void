@@ -2,116 +2,134 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>NEON VOID — Energy Game</title>
+<title>Anime Tap</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 *{box-sizing:border-box;font-family:Arial}
-body{margin:0;background:#000;color:#fff;overflow:hidden}
+body{margin:0;overflow:hidden;background:#12001f;color:#fff}
 
+/* ===== ФОН ===== */
 .bg{
   position:fixed;
   inset:0;
   background:
-    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.8)),
-    url("https://images.wallpapersden.com/image/download/anime-girl-neon-city-cyberpunk_bmdtbm6UmZqaraWkpJRmbmdlrWZlbWU.jpg")
-    center/cover no-repeat;
+    radial-gradient(circle at top,#4b006e,#12001f 70%);
   z-index:0;
 }
 
-#app{
-  position:relative;
-  z-index:1;
-  height:100vh;
-  width:100vw;
+/* ===== ЧАСТИЦЫ ===== */
+.particle{
+  position:absolute;
+  width:6px;
+  height:6px;
+  background:#ff7bff;
+  border-radius:50%;
+  opacity:.6;
+  animation:float linear infinite;
 }
 
+@keyframes float{
+  from{transform:translateY(110vh)}
+  to{transform:translateY(-10vh)}
+}
+
+/* ===== ОСНОВА ===== */
+#app{
+  position:relative;
+  z-index:2;
+  height:100vh;
+}
+
+/* ===== ВЕРХ ===== */
 .top{
   display:flex;
   justify-content:space-between;
-  padding:12px 18px;
-  font-size:16px;
+  padding:14px 18px;
+  font-size:18px;
 }
 
-.energy-core{
+/* ===== ТАП КРУГ ===== */
+.tap-core{
   position:absolute;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  width:220px;
-  height:220px;
+  width:240px;
+  height:240px;
   border-radius:50%;
-  background:radial-gradient(circle at top,#00fff0,#004dff);
+  background:
+    radial-gradient(circle at top,#ff6bff,#6a00a8);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:26px;
+  font-size:28px;
   font-weight:bold;
-  text-shadow:0 0 15px #00fff0;
-  box-shadow:0 0 50px #00fff0aa;
-  cursor:pointer;
+  text-shadow:0 0 12px #fff;
+  box-shadow:
+    0 0 40px #ff6bffaa,
+    inset 0 0 30px #ffffff33;
   animation:pulse 2s infinite;
 }
 
-.energy-core:active{
+.tap-core:active{
   transform:translate(-50%,-50%) scale(.95);
 }
 
 @keyframes pulse{
-  0%{box-shadow:0 0 25px #00fff066}
-  50%{box-shadow:0 0 65px #00fff0ff}
-  100%{box-shadow:0 0 25px #00fff066}
+  0%{box-shadow:0 0 25px #ff6bff66}
+  50%{box-shadow:0 0 60px #ff6bffff}
+  100%{box-shadow:0 0 25px #ff6bff66}
 }
 
+/* ===== НИЗ ===== */
 .bottom{
   position:absolute;
-  bottom:12px;
+  bottom:14px;
   width:100%;
   display:flex;
   justify-content:space-around;
 }
 
 .btn{
-  background:rgba(0,0,0,.6);
-  padding:12px 18px;
+  background:rgba(0,0,0,.55);
+  padding:12px 20px;
   border-radius:16px;
-  cursor:pointer;
   backdrop-filter:blur(6px);
 }
 
+/* ===== МОДАЛКИ ===== */
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.88);
+  background:rgba(0,0,0,.85);
   display:none;
   z-index:5;
 }
 
 .modal-content{
-  background:#111;
-  margin:40px 20px;
+  background:#1b002b;
+  margin:40px 18px;
   padding:20px;
   border-radius:18px;
-  max-height:80vh;
-  overflow:auto;
 }
 
 .close{
   position:absolute;
+  right:18px;
   top:10px;
-  right:16px;
   font-size:22px;
-  cursor:pointer;
 }
 
-.shop-item{
-  background:#1a1a1a;
+.item{
+  background:#2b0042;
   margin:12px 0;
   padding:14px;
   border-radius:14px;
 }
 
+/* ===== КОНФИДЕНЦ ===== */
 .privacy{
   position:fixed;
   inset:0;
@@ -123,14 +141,14 @@ body{margin:0;background:#000;color:#fff;overflow:hidden}
 }
 
 .privacy-box{
-  background:#111;
+  background:#1b002b;
   padding:26px;
   border-radius:18px;
   text-align:center;
 }
 
-.privacy button{
-  margin-top:16px;
+button{
+  margin-top:14px;
   padding:10px 22px;
   border-radius:14px;
   border:none;
@@ -141,11 +159,24 @@ body{margin:0;background:#000;color:#fff;overflow:hidden}
 <body>
 <div class="bg"></div>
 
+<!-- ЧАСТИЦЫ -->
+<script>
+for(let i=0;i<40;i++){
+  let p=document.createElement("div");
+  p.className="particle";
+  p.style.left=Math.random()*100+"vw";
+  p.style.animationDuration=(5+Math.random()*10)+"s";
+  p.style.opacity=Math.random();
+  document.body.appendChild(p);
+}
+</script>
+
+<!-- КОНФИДЕНЦ -->
 <div class="privacy" id="privacy">
   <div class="privacy-box">
     <h2>🔒 Конфиденциальность</h2>
     <p>Прогресс сохраняется</p>
-    <button onclick="acceptPrivacy()">Принять</button>
+    <button onclick="accept()">Принять</button>
   </div>
 </div>
 
@@ -155,104 +186,65 @@ body{margin:0;background:#000;color:#fff;overflow:hidden}
     <div>⚡ <span id="power">1</span></div>
   </div>
 
-  <div class="energy-core" onclick="tap()">TAP</div>
+  <div class="tap-core" onclick="tap()">TAP</div>
 
   <div class="bottom">
-    <div class="btn" onclick="openModal('shop')">🛒 Магазин</div>
-    <div class="btn" onclick="openModal('profile')">👤 Профиль</div>
-    <div class="btn" onclick="openModal('leaderboard')">🏆 Лидерборд</div>
+    <div class="btn" onclick="openM('shop')">🛒</div>
+    <div class="btn" onclick="openM('profile')">👤</div>
+    <div class="btn" onclick="openM('lead')">🏆</div>
   </div>
 </div>
 
 <div class="modal" id="shop">
   <div class="modal-content">
-    <div class="close" onclick="closeModal()">✖</div>
-    <h2>🛒 Магазин</h2>
-    <div class="shop-item">⚡ +1 сила — 50 <button onclick="buyPower(1,50)">Купить</button></div>
-    <div class="shop-item">⚡ +5 сила — 200 <button onclick="buyPower(5,200)">Купить</button></div>
-    <div class="shop-item">⏳ x2 (5 мин) — 150 <button onclick="buyBoost()">Купить</button></div>
+    <div class="close" onclick="closeM()">✖</div>
+    <h2>Магазин</h2>
+    <div class="item">+1 сила — 50 <button onclick="buy(1,50)">Купить</button></div>
+    <div class="item">x2 (5 мин) — 150 <button onclick="boost()">Купить</button></div>
   </div>
 </div>
 
 <div class="modal" id="profile">
   <div class="modal-content">
-    <div class="close" onclick="closeModal()">✖</div>
-    <h2>👤 Профиль</h2>
-    <p>ID: <span id="pid"></span></p>
+    <div class="close" onclick="closeM()">✖</div>
+    <h2>Профиль</h2>
     <p>Тапов: <span id="taps"></span></p>
-    <p>Сила: <span id="ppower"></span></p>
-    <p>Монет: <span id="pcoins"></span></p>
+    <p>Сила: <span id="pp"></span></p>
+    <p>Монеты: <span id="pc"></span></p>
   </div>
 </div>
 
-<div class="modal" id="leaderboard">
+<div class="modal" id="lead">
   <div class="modal-content">
-    <div class="close" onclick="closeModal()">✖</div>
-    <h2>🏆 Лидерборд</h2>
-    <p>1. Ты — <span id="lcoins"></span> 💰</p>
+    <div class="close" onclick="closeM()">✖</div>
+    <h2>Лидерборд</h2>
+    <p>Ты: <span id="lc"></span> 💰</p>
   </div>
 </div>
 
 <script>
-const tg = window.Telegram.WebApp; tg.expand();
-
-let data = JSON.parse(localStorage.getItem("neon")) || {
-  coins:0,power:1,taps:0,boostEnd:0
-};
-
-function save(){localStorage.setItem("neon",JSON.stringify(data))}
-function update(){
-  coins.innerText=data.coins;
-  power.innerText=data.power;
-  taps.innerText=data.taps;
-  ppower.innerText=data.power;
-  pcoins.innerText=data.coins;
-  lcoins.innerText=data.coins;
-  pid.innerText=tg.initDataUnsafe?.user?.id || "local";
+const tg=window.Telegram.WebApp; tg.expand();
+let d=JSON.parse(localStorage.getItem("animeTap"))||{c:0,p:1,t:0,b:0};
+function save(){localStorage.setItem("animeTap",JSON.stringify(d))}
+function upd(){
+  coins.innerText=d.c;
+  power.innerText=d.p;
+  taps.innerText=d.t;
+  pp.innerText=d.p;
+  pc.innerText=d.c;
+  lc.innerText=d.c;
 }
-
 function tap(){
-  let mult = Date.now()<data.boostEnd?2:1;
-  data.coins += data.power*mult;
-  data.taps++;
-  save();update();
+  let m=Date.now()<d.b?2:1;
+  d.c+=d.p*m; d.t++; save(); upd();
 }
-
-function buyPower(p,c){
-  if(data.coins>=c){
-    data.coins-=c;
-    data.power+=p;
-    save();update();
-  }
-}
-
-function buyBoost(){
-  if(data.coins>=150){
-    data.coins-=150;
-    data.boostEnd=Date.now()+5*60*1000;
-    save();update();
-  }
-}
-
-function openModal(id){
-  document.getElementById(id).style.display="block";
-}
-
-function closeModal(){
-  document.querySelectorAll(".modal")
-    .forEach(m=>m.style.display="none");
-}
-
-function acceptPrivacy(){
-  localStorage.setItem("privacy","1");
-  privacy.style.display="none";
-}
-
-if(localStorage.getItem("privacy")==="1"){
-  privacy.style.display="none";
-}
-
-update();
+function buy(p,c){if(d.c>=c){d.c-=c;d.p+=p;save();upd()}}
+function boost(){if(d.c>=150){d.c-=150;d.b=Date.now()+300000;save();upd()}}
+function openM(id){document.getElementById(id).style.display="block"}
+function closeM(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
+function accept(){localStorage.setItem("ok","1");privacy.style.display="none"}
+if(localStorage.getItem("ok"))privacy.style.display="none";
+upd();
 </script>
 </body>
 </html>
