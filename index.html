@@ -12,10 +12,7 @@
 <div id="privacy" class="overlay">
   <div class="card">
     <h2>🔒 Конфиденциальность</h2>
-    <p>
-      Прогресс сохраняется локально.<br>
-      Данные не передаются третьим лицам.
-    </p>
+    <p>Прогресс сохраняется локально</p>
     <button onclick="acceptPrivacy()">Принять</button>
   </div>
 </div>
@@ -33,28 +30,32 @@
   </div>
 
   <div class="menu">
-    <button onclick="openTab('shop')">🛒 Магазин</button>
-    <button onclick="openTab('profile')">👤 Профиль</button>
+    <button onclick="openTab('shop')">🛒</button>
+    <button onclick="openTab('profile')">👤</button>
     <button onclick="openTab('leader')">🏆</button>
   </div>
 
-  <!-- МАГАЗИН -->
   <div id="shop" class="panel hidden">
     <h3>🛒 Магазин</h3>
 
-    <h4>Навсегда</h4>
-    <button onclick="buy('x2', 100000)">⚡ x2 — 100K</button>
-    <button onclick="buy('x5', 500000)">🔥 x5 — 500K</button>
-    <button onclick="buy('auto', 1500000)">🤖 Автотап — 1.5M</button>
+    <h4>⚡ Улучшения</h4>
+    <button onclick="buy('p1', 10)">+1 к тапу — 10</button>
+    <button onclick="buy('p2', 50)">+2 к тапу — 50</button>
+    <button onclick="buy('p5', 250)">+5 к тапу — 250</button>
 
     <h4>⏱ Временные бусты</h4>
-    <button onclick="buyTemp(5, 300000, 60)">x5 — 1 мин</button>
-    <button onclick="buyTemp(10, 900000, 180)">x10 — 3 мин</button>
-    <button onclick="buyTemp(25, 5000000, 300)">x25 — 5 мин</button>
-    <button onclick="buyTemp(50, 20000000, 600)">x50 — 10 мин</button>
+    <button onclick="buyTemp(2, 100, 30)">x2 — 30 сек (100)</button>
+    <button onclick="buyTemp(5, 500, 60)">x5 — 1 мин (500)</button>
+    <button onclick="buyTemp(10, 2000, 120)">x10 — 2 мин (2K)</button>
+
+    <h4>🤖 Авто</h4>
+    <button onclick="buy('auto', 5000)">Автотап — 5K</button>
+
+    <h4>🔥 Продвинутые</h4>
+    <button onclick="buy('x2', 20000)">x2 навсегда — 20K</button>
+    <button onclick="buy('x5', 100000)">x5 навсегда — 100K</button>
   </div>
 
-  <!-- ПРОФИЛЬ -->
   <div id="profile" class="panel hidden">
     <h3>👤 Профиль</h3>
     <p>ID: <span id="pid"></span></p>
@@ -62,15 +63,13 @@
     <p>Сила тапа: <span id="pPower"></span></p>
     <p>Всего тапов: <span id="pTaps"></span></p>
     <p>Автотап: <span id="pAuto"></span></p>
-    <p>Временной буст: <span id="pBuff"></span></p>
-    <p>Дата старта: <span id="pStart"></span></p>
-    <p>Время в игре: <span id="pTime"></span></p>
+    <p>Буст: <span id="pBuff"></span></p>
+    <p>В игре: <span id="pTime"></span></p>
   </div>
 
-  <!-- ЛИДЕР -->
   <div id="leader" class="panel hidden">
     <h3>🏆 Лидерборд</h3>
-    <p>Локальный (будет серверный)</p>
+    <p>Появится позже</p>
   </div>
 
 </div>
