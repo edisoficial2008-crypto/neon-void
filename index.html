@@ -1,54 +1,222 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>NEON VOID</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON VOID — Energy Game</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:Arial,sans-serif;
+  background:url("bg.jpg") center/cover no-repeat fixed;
+  color:#fff;
+  overflow:hidden;
+}
+
+/* HUD */
+#hud{
+  background:rgba(0,0,0,.6);
+  padding:10px;
+  text-align:center;
+  font-size:16px;
+}
+
+/* Buttons */
+.menu{
+  display:flex;
+  gap:10px;
+  padding:10px;
+}
+.menu button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+  cursor:pointer;
+}
+
+/* Tap */
+#tap-wrapper{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:calc(100vh - 150px);
+}
+#tap{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:radial-gradient(circle,#00f6ff,#003cff);
+  box-shadow:
+    0 0 40px #00f6ff,
+    0 0 80px #0066ff,
+    inset 0 0 30px #fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:32px;
+  cursor:pointer;
+  transition:.1s;
+}
+#tap:active{transform:scale(.9)}
+
+/* Panels */
+.panel{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.96);
+  display:none;
+  flex-direction:column;
+  z-index:999;
+}
+.panel-header{
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  font-size:22px;
+}
+.close{cursor:pointer;font-size:28px}
+.panel-content{
+  padding:15px;
+  overflow-y:auto;
+}
+
+/* Items */
+.item{
+  background:#111;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+}
+</style>
 </head>
+
 <body>
 
-<div class="header">
-  <div class="title">NEON VOID</div>
-  <div class="stats">
-    Очки: <span id="points">124</span> |
-    Энергия: <span id="energy">3963</span>/4000
+<div id="hud">
+  💰 <span id="points">0</span> |
+  ⚡ <span id="energy">4000</span>/4000
+</div>
+
+<div class="menu">
+  <button onclick="openPanel('shop')">🛒 Магазин</button>
+  <button onclick="openPanel('profile')">👤 Профиль</button>
+  <button onclick="openPanel('leader')">🏆 Лидерборд</button>
+</div>
+
+<div id="tap-wrapper">
+  <div id="tap" onclick="tap()">TAP</div>
+</div>
+
+<!-- SHOP -->
+<div id="shop" class="panel">
+  <div class="panel-header">
+    Магазин
+    <div class="close" onclick="closePanel()">✖</div>
+  </div>
+  <div class="panel-content">
+    <div class="item" onclick="buy(1,50)">⚡ +1 за тап — 50</div>
+    <div class="item" onclick="buy(2,150)">⚡ x2 на 1 час — 150</div>
+    <div class="item" onclick="buy(3,200)">🔋 +1000 энергии — 200</div>
+    <div class="item" onclick="buy(4,300)">💰 +5 в час — 300</div>
+    <div class="item" onclick="buy(5,500)">🤖 Автотап 10 мин — 500</div>
   </div>
 </div>
 
-<div id="tapZone"></div>
-
-<div class="bottom-menu">
-  <button onclick="openModal('shop')">🛒</button>
-  <button onclick="openModal('profile')">👤</button>
-  <button onclick="openModal('leaderboard')">🏆</button>
-</div>
-
-<!-- МОДАЛКИ -->
-<div class="modal" id="shop">
-  <div class="modal-box">
-    <span class="close" onclick="closeModal()">✕</span>
-    <h2>Магазин</h2>
-    <p>Скоро апгрейды как у Notcoin</p>
+<!-- PROFILE -->
+<div id="profile" class="panel">
+  <div class="panel-header">
+    Профиль
+    <div class="close" onclick="closePanel()">✖</div>
+  </div>
+  <div class="panel-content">
+    👤 ID: <span id="pid"></span><br><br>
+    💰 Очки: <span id="ppoints"></span><br>
+    ⚡ Энергия: <span id="penergy"></span><br>
+    👆 Кликов: <span id="clicks"></span><br>
+    🧠 Уровень: <span id="level"></span><br>
+    💸 Доход/ч: <span id="income"></span><br>
+    📅 Регистрация: <span id="reg"></span>
+    <hr><br>
+    <button onclick="openPanel('policy')">📜 Политика</button>
   </div>
 </div>
 
-<div class="modal" id="profile">
-  <div class="modal-box">
-    <span class="close" onclick="closeModal()">✕</span>
-    <h2>Профиль</h2>
-    <p>Очки, энергия, уровень</p>
+<!-- LEADER -->
+<div id="leader" class="panel">
+  <div class="panel-header">
+    Лидерборд
+    <div class="close" onclick="closePanel()">✖</div>
+  </div>
+  <div class="panel-content">
+    🥇 Player1 — 9999<br>
+    🥈 Player2 — 5000<br>
+    🥉 Player3 — 3000
   </div>
 </div>
 
-<div class="modal" id="leaderboard">
-  <div class="modal-box">
-    <span class="close" onclick="closeModal()">✕</span>
-    <h2>Лидерборд</h2>
-    <p>Топ игроков</p>
+<!-- POLICY -->
+<div id="policy" class="panel">
+  <div class="panel-header">
+    Политика
+    <div class="close" onclick="closePanel()">✖</div>
+  </div>
+  <div class="panel-content">
+    Мы не собираем персональные данные.<br>
+    Вся статистика хранится локально.<br>
+    Используя игру, вы соглашаетесь с этим.
   </div>
 </div>
 
-<script src="script.js"></script>
+<script>
+let points=0,energy=4000,clicks=0,level=1,income=0;
+const uid=Math.floor(Math.random()*1e9);
+const reg=new Date().toLocaleDateString();
+
+function tap(){
+ if(energy<=0)return;
+ points++; energy--; clicks++;
+ update();
+}
+
+function buy(type,price){
+ if(points<price)return alert("Не хватает очков");
+ points-=price;
+ if(type===1){} 
+ if(type===3)energy=Math.min(4000,energy+1000);
+ update();
+}
+
+function update(){
+ pointsEl.textContent=points;
+ energyEl.textContent=energy;
+ ppoints.textContent=points;
+ penergy.textContent=energy;
+ clicksEl.textContent=clicks;
+ levelEl.textContent=level;
+ incomeEl.textContent=income;
+}
+
+function openPanel(id){
+ document.querySelectorAll('.panel').forEach(p=>p.style.display='none');
+ document.getElementById(id).style.display='flex';
+}
+
+function closePanel(){
+ document.querySelectorAll('.panel').forEach(p=>p.style.display='none');
+}
+
+pointsEl=points;
+energyEl=energy;
+
+pid.textContent=uid;
+regEl=reg;
+
+update();
+</script>
+
 </body>
 </html>
