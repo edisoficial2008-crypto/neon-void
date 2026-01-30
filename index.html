@@ -1,61 +1,34 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>NEON VOID</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<link rel="stylesheet" href="style.css">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <title>Neon Void</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-
 <body>
-<div id="app">
 
-  <h1>⚡ NEON VOID</h1>
+<div id="privacy-screen">
+  <h2>🔐 Политика конфиденциальности</h2>
+  <p>
+    Используя это приложение, вы соглашаетесь со следующим:
+    <br><br>
+    • Сохраняется только игровой прогресс<br>
+    • Используется только Telegram ID<br>
+    • Личные данные не собираются<br>
+    • Данные не передаются третьим лицам<br>
+    • Вы можете удалить данные в любой момент
+  </p>
 
-  <div class="stats">
-    <div>⚡<span id="energy">0</span></div>
-    <div>💎<span id="coins">0</span></div>
-    <div>🚀<span id="power">1</span></div>
-  </div>
+  <button onclick="acceptPrivacy()">✅ Принять</button>
+</div>
 
-  <!-- КРУГ ТАПА -->
-  <div id="tapCircle">TAP</div>
-
-  <!-- МЕНЮ -->
-  <div class="tabs">
-    <button data-tab="shop">🛒 Магазин</button>
-    <button data-tab="boost">🔥 Бусты</button>
-    <button data-tab="profile">👤 Профиль</button>
-  </div>
-
-  <!-- МАГАЗИН -->
-  <div id="shop" class="panel">
-    <button id="buyPower">➕ Сила +1 — 50💎</button>
-    <button id="buyPower5">➕ Сила +5 — 220💎</button>
-    <button id="buyEnergy">⚡ Макс энергия +50 — 150💎</button>
-    <button id="buyOffline">🕒 Оффлайн доход +1/сек — 300💎</button>
-  </div>
-
-  <!-- БУСТЫ -->
-  <div id="boost" class="panel">
-    <button id="boost2x">🔥 x2 TAP (30 сек) — 100💎</button>
-    <button id="boost3x">🔥 x3 TAP (20 сек) — 180💎</button>
-    <button id="boostAuto">🤖 Автотап (20 сек) — 250💎</button>
-    <p id="boostTimer"></p>
-  </div>
-
-  <!-- ПРОФИЛЬ -->
-  <div id="profile" class="panel">
-    <p>👆 Всего тапов: <span id="taps">0</span></p>
-    <p>⏱ Время в игре: <span id="time">0</span> сек</p>
-    <p>💰 Всего заработано: <span id="earned">0</span> 💎</p>
-    <p>🚀 Уровень силы: <span id="powerLvl">1</span></p>
-    <p>🕒 Оффлайн доход: <span id="offline">0</span> /сек</p>
-  </div>
-
+<div id="game-screen" style="display:none;">
+  <h1>🎮 Neon Void</h1>
+  <div id="tap-circle" onclick="tap()">TAP</div>
+  <p id="coins">Монеты: 0</p>
 </div>
 
 <script src="script.js"></script>
 </body>
-  </html>
+</html>
