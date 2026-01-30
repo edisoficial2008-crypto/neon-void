@@ -22,30 +22,40 @@
   <!-- КРУГ ТАПА -->
   <div id="tapCircle">TAP</div>
 
-  <!-- НИЖНЕЕ МЕНЮ -->
+  <!-- МЕНЮ -->
   <div class="tabs">
     <button data-tab="shop">🛒 Магазин</button>
     <button data-tab="boost">🔥 Бусты</button>
     <button data-tab="profile">👤 Профиль</button>
   </div>
 
-  <!-- ПАНЕЛИ -->
+  <!-- МАГАЗИН -->
   <div id="shop" class="panel">
-    <button id="buyPower">➕ Сила (+1) — 20💎</button>
+    <button id="buyPower">➕ Сила +1 — 50💎</button>
+    <button id="buyPower5">➕ Сила +5 — 220💎</button>
+    <button id="buyEnergy">⚡ Макс энергия +50 — 150💎</button>
+    <button id="buyOffline">🕒 Оффлайн доход +1/сек — 300💎</button>
   </div>
 
+  <!-- БУСТЫ -->
   <div id="boost" class="panel">
-    <button id="boostBtn">x2 TAP (30 сек) — 30💎</button>
+    <button id="boost2x">🔥 x2 TAP (30 сек) — 100💎</button>
+    <button id="boost3x">🔥 x3 TAP (20 сек) — 180💎</button>
+    <button id="boostAuto">🤖 Автотап (20 сек) — 250💎</button>
     <p id="boostTimer"></p>
   </div>
 
+  <!-- ПРОФИЛЬ -->
   <div id="profile" class="panel">
-    <p>Тапы: <span id="taps">0</span></p>
-    <p>Время в игре: <span id="time">0</span> сек</p>
+    <p>👆 Всего тапов: <span id="taps">0</span></p>
+    <p>⏱ Время в игре: <span id="time">0</span> сек</p>
+    <p>💰 Всего заработано: <span id="earned">0</span> 💎</p>
+    <p>🚀 Уровень силы: <span id="powerLvl">1</span></p>
+    <p>🕒 Оффлайн доход: <span id="offline">0</span> /сек</p>
   </div>
 
 </div>
 
 <script src="script.js"></script>
 </body>
-</html>
+  </html>
