@@ -1,21 +1,12 @@
-let score = 0;
-let boost = 1;
-
-const scoreEl = document.getElementById("score");
+let energy = 0;
+const score = document.getElementById("score");
 const tapBtn = document.getElementById("tap");
 
-tapBtn.addEventListener("click", () => {
-  score += boost;
-  scoreEl.textContent = score;
-});
+tapBtn.onclick = () => {
+  energy++;
+  score.innerText = "Energy: " + energy;
 
-function buyBoost() {
-  if (score >= 10) {
-    score -= 10;
-    boost = 2;
-    scoreEl.textContent = score;
-    alert("Буст x2 активирован!");
-  } else {
-    alert("Не хватает очков");
+  if (window.Telegram.WebApp) {
+    Telegram.WebApp.HapticFeedback.impactOccurred("medium");
   }
-}
+};
