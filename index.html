@@ -1,25 +1,52 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>NEON VOID</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>NEON VOID</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="header">
-  <h1>NEON VOID</h1>
-  <p>Очки: <span id="score">124</span> | Энергия: <span id="energy">3963</span>/4000</p>
+  <div class="title">NEON VOID</div>
+  <div class="stats">
+    Очки: <span id="points">124</span> |
+    Энергия: <span id="energy">3963</span>/4000
+  </div>
 </div>
 
-<!-- ТАП ЗОНА -->
 <div id="tapZone"></div>
 
-<!-- НИЖНЕЕ МЕНЮ -->
 <div class="bottom-menu">
-  <button onclick="openShop()">🛒</button>
-  <button onclick="openProfile()">👤</button>
-  <button onclick="openLeaderboard()">🏆</button>
+  <button onclick="openModal('shop')">🛒</button>
+  <button onclick="openModal('profile')">👤</button>
+  <button onclick="openModal('leaderboard')">🏆</button>
+</div>
+
+<!-- МОДАЛКИ -->
+<div class="modal" id="shop">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal()">✕</span>
+    <h2>Магазин</h2>
+    <p>Скоро апгрейды как у Notcoin</p>
+  </div>
+</div>
+
+<div class="modal" id="profile">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal()">✕</span>
+    <h2>Профиль</h2>
+    <p>Очки, энергия, уровень</p>
+  </div>
+</div>
+
+<div class="modal" id="leaderboard">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal()">✕</span>
+    <h2>Лидерборд</h2>
+    <p>Топ игроков</p>
+  </div>
 </div>
 
 <script src="script.js"></script>
