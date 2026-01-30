@@ -11,43 +11,45 @@
 body{margin:0;background:#000;color:#fff;overflow:hidden}
 
 .bg{
-  position:fixed;inset:0;
-  background:url("https://images.wallpapersden.com/image/download/anime-girl-cyberpunk-neon_bmdtbGaUmZqaraWkpJRmZW1lrWdtbWU.jpg") center/cover no-repeat;
-  filter:brightness(.4);
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.8)),
+    url("https://images.wallpapersden.com/image/download/anime-girl-neon-city-cyberpunk_bmdtbm6UmZqaraWkpJRmbmdlrWZlbWU.jpg")
+    center/cover no-repeat;
   z-index:0;
 }
 
-#app{position:relative;z-index:1;height:100vh;width:100vw}
+#app{
+  position:relative;
+  z-index:1;
+  height:100vh;
+  width:100vw;
+}
 
 .top{
   display:flex;
-  justify-content:space-around;
-  padding:10px;
+  justify-content:space-between;
+  padding:12px 18px;
   font-size:16px;
 }
 
 .energy-core{
   position:absolute;
-  top:50%;left:50%;
+  top:50%;
+  left:50%;
   transform:translate(-50%,-50%);
-  width:230px;
-  height:230px;
-  clip-path:polygon(
-    50% 0%,
-    93% 25%,
-    93% 75%,
-    50% 100%,
-    7% 75%,
-    7% 25%
-  );
-  background:linear-gradient(135deg,#00fff0,#004dff);
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:radial-gradient(circle at top,#00fff0,#004dff);
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:26px;
   font-weight:bold;
   text-shadow:0 0 15px #00fff0;
-  box-shadow:0 0 40px #00fff099;
+  box-shadow:0 0 50px #00fff0aa;
   cursor:pointer;
   animation:pulse 2s infinite;
 }
@@ -57,53 +59,57 @@ body{margin:0;background:#000;color:#fff;overflow:hidden}
 }
 
 @keyframes pulse{
-  0%{box-shadow:0 0 25px #00fff055}
-  50%{box-shadow:0 0 60px #00fff0cc}
-  100%{box-shadow:0 0 25px #00fff055}
+  0%{box-shadow:0 0 25px #00fff066}
+  50%{box-shadow:0 0 65px #00fff0ff}
+  100%{box-shadow:0 0 25px #00fff066}
 }
 
 .bottom{
   position:absolute;
-  bottom:15px;
+  bottom:12px;
   width:100%;
   display:flex;
   justify-content:space-around;
 }
+
 .btn{
-  background:#111;
+  background:rgba(0,0,0,.6);
   padding:12px 18px;
-  border-radius:14px;
+  border-radius:16px;
   cursor:pointer;
+  backdrop-filter:blur(6px);
 }
 
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.85);
+  background:rgba(0,0,0,.88);
   display:none;
   z-index:5;
 }
+
 .modal-content{
   background:#111;
-  margin:40px;
+  margin:40px 20px;
   padding:20px;
-  border-radius:16px;
+  border-radius:18px;
   max-height:80vh;
   overflow:auto;
 }
+
 .close{
   position:absolute;
   top:10px;
-  right:15px;
+  right:16px;
   font-size:22px;
   cursor:pointer;
 }
 
 .shop-item{
   background:#1a1a1a;
-  margin:10px 0;
-  padding:12px;
-  border-radius:12px;
+  margin:12px 0;
+  padding:14px;
+  border-radius:14px;
 }
 
 .privacy{
@@ -115,16 +121,18 @@ body{margin:0;background:#000;color:#fff;overflow:hidden}
   justify-content:center;
   z-index:10;
 }
+
 .privacy-box{
   background:#111;
-  padding:25px;
-  border-radius:16px;
+  padding:26px;
+  border-radius:18px;
   text-align:center;
 }
+
 .privacy button{
-  margin-top:15px;
-  padding:10px 20px;
-  border-radius:12px;
+  margin-top:16px;
+  padding:10px 22px;
+  border-radius:14px;
   border:none;
 }
 </style>
@@ -147,7 +155,7 @@ body{margin:0;background:#000;color:#fff;overflow:hidden}
     <div>⚡ <span id="power">1</span></div>
   </div>
 
-  <div class="energy-core" onclick="tap()">ENERGY</div>
+  <div class="energy-core" onclick="tap()">TAP</div>
 
   <div class="bottom">
     <div class="btn" onclick="openModal('shop')">🛒 Магазин</div>
@@ -156,7 +164,6 @@ body{margin:0;background:#000;color:#fff;overflow:hidden}
   </div>
 </div>
 
-<!-- МОДАЛКИ -->
 <div class="modal" id="shop">
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✖</div>
@@ -211,14 +218,39 @@ function tap(){
   save();update();
 }
 
-function buyPower(p,c){if(data.coins>=c){data.coins-=c;data.power+=p;save();update()}}
-function buyBoost(){if(data.coins>=150){data.coins-=150;data.boostEnd=Date.now()+5*60*1000;save();update()}}
+function buyPower(p,c){
+  if(data.coins>=c){
+    data.coins-=c;
+    data.power+=p;
+    save();update();
+  }
+}
 
-function openModal(id){document.getElementById(id).style.display="block"}
-function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
+function buyBoost(){
+  if(data.coins>=150){
+    data.coins-=150;
+    data.boostEnd=Date.now()+5*60*1000;
+    save();update();
+  }
+}
 
-function acceptPrivacy(){localStorage.setItem("privacy","1");privacy.style.display="none"}
-if(localStorage.getItem("privacy")=="1") privacy.style.display="none";
+function openModal(id){
+  document.getElementById(id).style.display="block";
+}
+
+function closeModal(){
+  document.querySelectorAll(".modal")
+    .forEach(m=>m.style.display="none");
+}
+
+function acceptPrivacy(){
+  localStorage.setItem("privacy","1");
+  privacy.style.display="none";
+}
+
+if(localStorage.getItem("privacy")==="1"){
+  privacy.style.display="none";
+}
 
 update();
 </script>
