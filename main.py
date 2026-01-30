@@ -1,29 +1,14 @@
-import os
-from fastapi import FastAPI
-from telegram import Update
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    ContextTypes,
-)
+from flask import Flask, jsonify
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+app = Flask(__name__)
 
-app = FastAPI()
+@app.route("/")
+def home():
+    return "NEON VOID SERVER LIVE"
 
-@app.get("/")
-def root():
-    return {"status": "Neon Void backend is running"}
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "⚡ Neon Void активирован.\n\nБот работает."
-    )
-
-def start_bot():
-    app_bot = ApplicationBuilder().token(BOT_TOKEN).build()
-    app_bot.add_handler(CommandHandler("start", start))
-    app_bot.run_polling()
+@app.route("/tap", methods=["POST"])
+def tap():
+    return jsonify({"status": "ok", "reward": 1})
 
 if __name__ == "__main__":
-    start_bot()
+    app.run(host="0.0.0.0", port=10000)
