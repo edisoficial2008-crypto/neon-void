@@ -1,3 +1,2 @@
-# Neon Void
-
-Telegram WebApp tap game.
+Neon Void Backend  
+FastAPI server for Telegram WebApp tap game.
