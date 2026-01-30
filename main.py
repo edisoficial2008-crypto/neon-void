@@ -10,11 +10,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/save")
-async def save_game(data: dict):
-    print("SAVE:", data)
-    return {"status": "ok"}
-
 @app.get("/")
 def root():
-    return {"Neon Void": "Backend Online"}
+    return {"status": "Neon Void online"}
