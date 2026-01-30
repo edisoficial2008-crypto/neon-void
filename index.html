@@ -2,41 +2,66 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Neon Sakura</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <title>Anime Tap World</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- PRIVACY -->
+<!-- ПРИВАТНОСТЬ -->
 <div id="privacy" class="screen">
   <div class="card">
-    <h1>🌸 Privacy Policy</h1>
+    <h2>🔒 Политика</h2>
     <div class="text">
-      <p>Мы сохраняем только игровой прогресс.</p>
-      <ul>
-        <li>Используется Telegram ID</li>
-        <li>Личные данные не собираются</li>
-        <li>Данные не передаются</li>
-        <li>Можно удалить данные</li>
-      </ul>
-      <p>Нажимая кнопку ниже, вы соглашаетесь.</p>
+      Используя бота, вы соглашаетесь на сохранение прогресса.
     </div>
-    <button onclick="accept()">Принять</button>
+    <button onclick="acceptPrivacy()">Принять</button>
   </div>
 </div>
 
-<!-- GAME -->
+<!-- ИГРА -->
 <div id="game" class="screen hidden">
-  <h2>🌸 Neon Sakura</h2>
+
+  <div class="info">
+    💰 <span id="coins">0</span> | ⚡ <span id="power">1</span>
+  </div>
 
   <div id="tap-circle" onclick="tap()">TAP</div>
 
-  <div class="info">
-    <p id="coins">Монеты: 0</p>
-    <p id="level">Уровень: 1</p>
+  <div class="menu">
+    <button onclick="openTab('shop')">🛒</button>
+    <button onclick="openTab('profile')">👤</button>
+    <button onclick="openTab('leader')">🏆</button>
   </div>
+
+  <!-- МАГАЗИН -->
+  <div id="shop" class="panel hidden">
+    <h3>🛒 Магазин</h3>
+
+    <h4>Навсегда</h4>
+    <button onclick="buy('x2', 50000)">⚡ x2 — 50K</button>
+    <button onclick="buy('auto', 200000)">🤖 Автотап</button>
+
+    <h4>⏱ Временные</h4>
+    <button onclick="buyTemp('x5', 300000, 60)">🔥 x5 (1 мин)</button>
+    <button onclick="buyTemp('x10', 1000000, 300)">💥 x10 (5 мин)</button>
+  </div>
+
+  <!-- ПРОФИЛЬ -->
+  <div id="profile" class="panel hidden">
+    <h3>👤 Профиль</h3>
+    <p>Монеты: <span id="pCoins"></span></p>
+    <p>Сила: <span id="pPower"></span></p>
+    <p>Автотап: <span id="pAuto"></span></p>
+  </div>
+
+  <!-- ЛИДЕР -->
+  <div id="leader" class="panel hidden">
+    <h3>🏆 Лидерборд</h3>
+    <p>Локальный (в разработке)</p>
+  </div>
+
 </div>
 
 <script src="script.js"></script>
