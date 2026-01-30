@@ -1,231 +1,82 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!DOCTYPE html><html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>NEON VOID – Energy Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>NEON VOID — Energy Game</title>
 <style>
-* { box-sizing: border-box; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Comic Sans MS',cursive;}
+body{height:100vh;overflow:hidden;color:#fff;background:radial-gradient(circle at center,#7a00ff 0%,#2a0033 60%,#120016 100%);} header{text-align:center;padding:12px 0;} header h1{font-size:26px;letter-spacing:2px;} header p{opacity:.7;}
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background:
-    radial-gradient(circle at 30% 20%, #6a00ff44, transparent 40%),
-    radial-gradient(circle at 70% 80%, #ff00ff33, transparent 45%),
-    linear-gradient(180deg, #0b0015, #1a0033);
-  color: white;
-  height: 100vh;
-  overflow: hidden;
-}
+/* TAP */ #tap-area{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);} #tap-btn{ width:220px;height:220px;border-radius:50%; background:radial-gradient(circle,#ff7bff,#6a00cc); box-shadow:0 0 60px #ff4dff; display:flex;align-items:center;justify-content:center; font-size:36px;cursor:pointer;user-select:none; } #tap-btn:active{transform:scale(.95);}
 
-header {
-  text-align: center;
-  padding-top: 12px;
-  font-size: 26px;
-  font-weight: bold;
-}
+/* EFFECTS */ .effect{position:absolute;border-radius:50%;border:2px solid #ff7bff;animation:boom .7s ease-out forwards;pointer-events:none;} @keyframes boom{from{width:0;height:0;opacity:1;}to{width:260px;height:260px;opacity:0;}}
 
-#score {
-  text-align: center;
-  opacity: 0.8;
-  margin-top: 4px;
-}
+/* PANELS */ .panel{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,0,20,.95);display:none;padding:20px;} .panel.active{display:block;} .close{position:absolute;top:15px;right:20px;font-size:28px;cursor:pointer;}
 
-#tapArea {
-  width: 220px;
-  height: 220px;
-  margin: 80px auto;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ff4bff, #7a00cc);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 34px;
-  cursor: pointer;
-  box-shadow: 0 0 50px #ff4bff;
-  position: relative;
-  user-select: none;
-}
+/* NAV */ nav{position:absolute;bottom:0;left:0;width:100%;display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.4);} nav div{opacity:.7;cursor:pointer;} nav div.active{opacity:1;}
 
-#tapArea:active {
-  transform: scale(0.95);
-}
+button{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;}
 
-.effect {
-  position: absolute;
-  color: #fff;
-  font-size: 20px;
-  animation: floatUp 1s ease-out forwards;
-  pointer-events: none;
-}
-
-@keyframes floatUp {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-60px); }
-}
-
-.ripple {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  animation: ripple 0.6s ease-out forwards;
-}
-
-@keyframes ripple {
-  from { transform: scale(1); opacity: 1; }
-  to { transform: scale(8); opacity: 0; }
-}
-
-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  background: rgba(0,0,0,0.7);
-}
-
-nav button {
-  flex: 1;
-  padding: 14px;
-  font-size: 16px;
-  background: none;
-  color: white;
-  border: none;
-}
-
-.screen {
-  display: none;
-  padding: 20px;
-}
-
-.screen.active {
-  display: block;
-}
-
-.item {
-  margin: 12px 0;
-  padding: 12px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-}
 </style>
 </head>
-
 <body>
+<header>
+  <h1>NEON VOID</h1>
+  <p>Очки: <span id="score">0</span> | Энергия: <span id="energy">4000</span>/4000</p>
+</header><div id="tap-area">
+  <div id="tap-btn">TAP</div>
+</div><!-- SHOP --><div id="shop" class="panel">
+  <div class="close" onclick="closePanels()">✖</div>
+  <h2>🛒 Магазин</h2><br>
+  <div>+1 за тап — 50 очков <button onclick="buyTap()">Купить</button></div><br>
+  <div>Авто-тап (30 мин) — 300 <button onclick="buyAuto()">Купить</button></div>
+</div><!-- PROFILE --><div id="profile" class="panel">
+  <div class="close" onclick="closePanels()">✖</div>
+  <h2>👤 Профиль</h2><br>
+  <p>Очки: <span id="pScore">0</span></p>
+  <p>Сила тапа: <span id="pTap">1</span></p>
+  <p>Всего тапов: <span id="pTaps">0</span></p>
+</div><!-- LEADER --><div id="leader" class="panel">
+  <div class="close" onclick="closePanels()">✖</div>
+  <h2>🏆 Лидерборд</h2><br>
+  <p>1. Ты — <span id="lScore">0</span></p>
+</div><nav>
+  <div onclick="openPanel('shop')">🛒</div>
+  <div onclick="openPanel('profile')">👤</div>
+  <div onclick="openPanel('leader')">🏆</div>
+</nav><script>
+let score=0, tapPower=1, energy=4000, taps=0;
 
-<header>NEON VOID</header>
-<div id="score">Очки: <span id="points">0</span></div>
-
-<div id="game" class="screen active">
-  <div id="tapArea">TAP</div>
-</div>
-
-<div id="shop" class="screen">
-  <h2>🛒 Магазин</h2>
-  <div class="item">
-    +1 за тап — 50 очков
-    <button onclick="buyUpgrade()">Купить</button>
-  </div>
-</div>
-
-<div id="profile" class="screen">
-  <h2>👤 Профиль</h2>
-  <p>Очки: <span id="profilePoints">0</span></p>
-  <p>Сила тапа: <span id="tapPower">1</span></p>
-</div>
-
-<div id="leaderboard" class="screen">
-  <h2>🏆 Лидерборд</h2>
-  <ol id="leaders"></ol>
-</div>
-
-<nav>
-  <button onclick="openScreen('game')">🎮</button>
-  <button onclick="openScreen('shop')">🛒</button>
-  <button onclick="openScreen('profile')">👤</button>
-  <button onclick="openScreen('leaderboard')">🏆</button>
-</nav>
-
-<script>
-let points = parseInt(localStorage.getItem("points")) || 0;
-let power = parseInt(localStorage.getItem("power")) || 1;
-
-const pointsEl = document.getElementById("points");
-const tapArea = document.getElementById("tapArea");
-
-function save() {
-  localStorage.setItem("points", points);
-  localStorage.setItem("power", power);
+function update(){
+  score+=tapPower; taps++; energy--;
+  document.getElementById('score').textContent=score;
+  document.getElementById('energy').textContent=energy;
+  document.getElementById('pScore').textContent=score;
+  document.getElementById('pTap').textContent=tapPower;
+  document.getElementById('pTaps').textContent=taps;
+  document.getElementById('lScore').textContent=score;
 }
 
-function updateUI() {
-  pointsEl.textContent = points;
-  document.getElementById("profilePoints").textContent = points;
-  document.getElementById("tapPower").textContent = power;
+const tapBtn=document.getElementById('tap-btn');
+
+tapBtn.onclick=(e)=>{
+  if(energy<=0) return;
+  update();
+  const ef=document.createElement('div');
+  ef.className='effect';
+  ef.style.left=e.clientX-130+'px';
+  ef.style.top=e.clientY-130+'px';
+  document.body.appendChild(ef);
+  setTimeout(()=>ef.remove(),700);
 }
 
-tapArea.onclick = (e) => {
-  points += power;
-  save();
-  updateUI();
+function buyTap(){if(score>=50){score-=50;tapPower++;}}
+function buyAuto(){alert('Автотап в разработке');}
 
-  // +число
-  const text = document.createElement("div");
-  text.className = "effect";
-  text.textContent = "+" + power;
-  text.style.left = "50%";
-  text.style.top = "50%";
-  tapArea.appendChild(text);
-  setTimeout(() => text.remove(), 1000);
+function openPanel(id){closePanels();document.getElementById(id).classList.add('active');}
+function closePanels(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));}
 
-  // рябь
-  const ripple = document.createElement("div");
-  ripple.className = "ripple";
-  ripple.style.left = e.offsetX + "px";
-  ripple.style.top = e.offsetY + "px";
-  tapArea.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 600);
-};
-
-function buyUpgrade() {
-  if (points >= 50) {
-    points -= 50;
-    power++;
-    save();
-    updateUI();
-    alert("Апгрейд куплен!");
-  } else alert("Не хватает очков");
-}
-
-function openScreen(name) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(name).classList.add("active");
-  if (name === "leaderboard") loadLeaders();
-}
-
-function loadLeaders() {
-  let best = JSON.parse(localStorage.getItem("leaders")) || [];
-  if (!best.includes(points)) {
-    best.push(points);
-    best.sort((a,b)=>b-a);
-    best = best.slice(0,5);
-    localStorage.setItem("leaders", JSON.stringify(best));
-  }
-  const list = document.getElementById("leaders");
-  list.innerHTML = "";
-  best.forEach(p => {
-    const li = document.createElement("li");
-    li.textContent = p + " очков";
-    list.appendChild(li);
-  });
-}
-
-updateUI();
-</script>
-
-</body>
+// ENERGY REGEN
+setInterval(()=>{if(energy<4000) energy+=Math.ceil(4000/1800);},1000);
+</script></body>
 </html>
