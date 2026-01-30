@@ -21,7 +21,6 @@ body{
 .top{
   text-align:center;
   padding:10px;
-  z-index:2;
 }
 
 .tap-zone{
@@ -47,7 +46,6 @@ body{
   display:flex;
   justify-content:space-around;
   padding:10px;
-  z-index:3;
 }
 
 .menu button{
@@ -67,6 +65,18 @@ body{
   padding:15px;
   overflow:auto;
   z-index:100;
+}
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.close{
+  font-size:22px;
+  cursor:pointer;
 }
 
 button{
