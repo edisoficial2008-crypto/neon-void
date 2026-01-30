@@ -1,47 +1,70 @@
-let coins = 0;
-let level = 1;
-
-window.onload = () => {
-  const accepted = localStorage.getItem("privacy");
-  coins = Number(localStorage.getItem("coins")) || 0;
-  level = Number(localStorage.getItem("level")) || 1;
-
-  if (accepted === "true") {
-    showGame();
-  } else {
-    showPrivacy();
-  }
+let data = JSON.parse(localStorage.getItem("game")) || {
+  coins: 0,
+  power: 1,
+  auto: false,
+  temp: null,
+  tempEnd: 0
 };
 
-function showPrivacy() {
-  document.getElementById("privacy").classList.remove("hidden");
-  document.getElementById("game").classList.add("hidden");
+function save() {
+  localStorage.setItem("game", JSON.stringify(data));
 }
 
-function showGame() {
+function acceptPrivacy() {
+  localStorage.setItem("privacy", "1");
   document.getElementById("privacy").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
-  updateUI();
 }
 
-function accept() {
-  localStorage.setItem("privacy", "true");
-  showGame();
-}
+if (localStorage.getItem("privacy")) acceptPrivacy();
 
 function tap() {
-  coins += 1;
+  let mult = data.power;
+  if (data.temp && Date.now() < data.tempEnd) mult *= data.temp;
+  data.coins += mult;
+  update();
+}
 
-  if (coins >= level * 50) {
-    level += 1;
+function buy(type, price) {
+  if (data.coins < price) return alert("Мало монет");
+  data.coins -= price;
+
+  if (type === "x2") data.power *= 2;
+  if (type === "auto") data.auto = true;
+
+  update();
+}
+
+function buyTemp(mult, price, sec) {
+  if (data.coins < price) return alert("Мало монет");
+  data.coins -= price;
+  data.temp = mult === "x5" ? 5 : 10;
+  data.tempEnd = Date.now() + sec * 1000;
+  update();
+}
+
+function openTab(id) {
+  ["shop","profile","leader"].forEach(p =>
+    document.getElementById(p).classList.add("hidden")
+  );
+  document.getElementById(id).classList.remove("hidden");
+  update();
+}
+
+function update() {
+  document.getElementById("coins").textContent = data.coins;
+  document.getElementById("power").textContent = data.power;
+  document.getElementById("pCoins").textContent = data.coins;
+  document.getElementById("pPower").textContent = data.power;
+  document.getElementById("pAuto").textContent = data.auto ? "Да" : "Нет";
+  save();
+}
+
+setInterval(() => {
+  if (data.auto) {
+    data.coins += data.power;
+    update();
   }
+}, 1000);
 
-  localStorage.setItem("coins", coins);
-  localStorage.setItem("level", level);
-  updateUI();
-}
-
-function updateUI() {
-  document.getElementById("coins").innerText = "Монеты: " + coins;
-  document.getElementById("level").innerText = "Уровень: " + level;
-}
+update();
