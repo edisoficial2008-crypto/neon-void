@@ -29,18 +29,19 @@
     <div id="tap-circle" onclick="tap()">TAP</div>
   </div>
 
-  <!-- МЕНЮ -->
   <div class="menu">
     <button onclick="openTab('shop')">🛒 Магазин</button>
     <button onclick="openTab('profile')">👤 Профиль</button>
     <button onclick="openTab('leader')">🏆 Лидерборд</button>
   </div>
-
 </div>
 
-<!-- ПАНЕЛИ ВНЕ app !!! -->
+<!-- МАГАЗИН -->
 <div id="shop" class="panel hidden">
-  <h3>🛒 Магазин</h3>
+  <div class="panel-head">
+    <h3>🛒 Магазин</h3>
+    <span class="close" onclick="closePanels()">✖</span>
+  </div>
 
   <button onclick="buy('p1',10)">+1 к тапу — 10</button>
   <button onclick="buy('p2',50)">+2 к тапу — 50</button>
@@ -48,8 +49,13 @@
   <button onclick="buyTemp(5,500,60)">x5 на 1 мин — 500</button>
 </div>
 
+<!-- ПРОФИЛЬ -->
 <div id="profile" class="panel hidden">
-  <h3>👤 Профиль</h3>
+  <div class="panel-head">
+    <h3>👤 Профиль</h3>
+    <span class="close" onclick="closePanels()">✖</span>
+  </div>
+
   <p>ID: <span id="pid"></span></p>
   <p>Монеты: <span id="pCoins"></span></p>
   <p>Сила: <span id="pPower"></span></p>
@@ -58,11 +64,16 @@
   <p>В игре: <span id="pTime"></span></p>
 </div>
 
+<!-- ЛИДЕРБОРД -->
 <div id="leader" class="panel hidden">
-  <h3>🏆 Лидерборд</h3>
+  <div class="panel-head">
+    <h3>🏆 Лидерборд</h3>
+    <span class="close" onclick="closePanels()">✖</span>
+  </div>
+
   <p>Скоро…</p>
 </div>
 
 <script src="script.js"></script>
 </body>
-</html>
+    </html>
