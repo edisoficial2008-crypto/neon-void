@@ -3,35 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>Anime Tap World</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ПРИВАТНОСТЬ -->
-<div id="privacy" class="screen">
+<div id="privacy" class="overlay">
   <div class="card">
-    <h2>🔒 Политика</h2>
-    <div class="text">
-      Используя бота, вы соглашаетесь на сохранение прогресса.
-    </div>
+    <h2>🔒 Конфиденциальность</h2>
+    <p>
+      Прогресс сохраняется локально.<br>
+      Данные не передаются третьим лицам.
+    </p>
     <button onclick="acceptPrivacy()">Принять</button>
   </div>
 </div>
 
-<!-- ИГРА -->
-<div id="game" class="screen hidden">
+<div id="app" class="app hidden">
 
-  <div class="info">
-    💰 <span id="coins">0</span> | ⚡ <span id="power">1</span>
+  <div class="top">
+    💰 <span id="coins">0</span>
+    ⚡ <span id="power">1</span>
+    ⏱ <span id="buff">—</span>
   </div>
 
-  <div id="tap-circle" onclick="tap()">TAP</div>
+  <div class="tap-zone">
+    <div id="tap-circle" onclick="tap()">TAP</div>
+  </div>
 
   <div class="menu">
-    <button onclick="openTab('shop')">🛒</button>
-    <button onclick="openTab('profile')">👤</button>
+    <button onclick="openTab('shop')">🛒 Магазин</button>
+    <button onclick="openTab('profile')">👤 Профиль</button>
     <button onclick="openTab('leader')">🏆</button>
   </div>
 
@@ -40,26 +43,34 @@
     <h3>🛒 Магазин</h3>
 
     <h4>Навсегда</h4>
-    <button onclick="buy('x2', 50000)">⚡ x2 — 50K</button>
-    <button onclick="buy('auto', 200000)">🤖 Автотап</button>
+    <button onclick="buy('x2', 100000)">⚡ x2 — 100K</button>
+    <button onclick="buy('x5', 500000)">🔥 x5 — 500K</button>
+    <button onclick="buy('auto', 1500000)">🤖 Автотап — 1.5M</button>
 
-    <h4>⏱ Временные</h4>
-    <button onclick="buyTemp('x5', 300000, 60)">🔥 x5 (1 мин)</button>
-    <button onclick="buyTemp('x10', 1000000, 300)">💥 x10 (5 мин)</button>
+    <h4>⏱ Временные бусты</h4>
+    <button onclick="buyTemp(5, 300000, 60)">x5 — 1 мин</button>
+    <button onclick="buyTemp(10, 900000, 180)">x10 — 3 мин</button>
+    <button onclick="buyTemp(25, 5000000, 300)">x25 — 5 мин</button>
+    <button onclick="buyTemp(50, 20000000, 600)">x50 — 10 мин</button>
   </div>
 
   <!-- ПРОФИЛЬ -->
   <div id="profile" class="panel hidden">
     <h3>👤 Профиль</h3>
+    <p>ID: <span id="pid"></span></p>
     <p>Монеты: <span id="pCoins"></span></p>
-    <p>Сила: <span id="pPower"></span></p>
+    <p>Сила тапа: <span id="pPower"></span></p>
+    <p>Всего тапов: <span id="pTaps"></span></p>
     <p>Автотап: <span id="pAuto"></span></p>
+    <p>Временной буст: <span id="pBuff"></span></p>
+    <p>Дата старта: <span id="pStart"></span></p>
+    <p>Время в игре: <span id="pTime"></span></p>
   </div>
 
   <!-- ЛИДЕР -->
   <div id="leader" class="panel hidden">
     <h3>🏆 Лидерборд</h3>
-    <p>Локальный (в разработке)</p>
+    <p>Локальный (будет серверный)</p>
   </div>
 
 </div>
