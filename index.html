@@ -78,10 +78,6 @@ body {
     padding: 8px 12px;
 }
 
-.hidden {
-    display: none;
-}
-
 .screen {
     display: none;
 }
@@ -111,15 +107,12 @@ body {
 
 <button class="big-button" onclick="tap()">ТАП</button>
 
-<!-- МЕНЮ -->
 <div class="menu">
 <button onclick="show('main')">Главная</button>
 <button onclick="show('shop')">Магазин</button>
 <button onclick="show('profile')">Профиль</button>
 <button onclick="show('leaders')">Лидеры</button>
 </div>
-
-<!-- ЭКРАНЫ -->
 
 <div id="main" class="screen active">
 <h3>🏠 Главная</h3>
@@ -132,6 +125,7 @@ body {
 <div class="card">⚡ +100 энергии — 8000 очков</div>
 <div class="card">🚀 Автотап — 20000 очков</div>
 <div class="card">🌌 Премиум — 100000 очков</div>
+<div class="card">🛡 Легендарный буст — 500000 очков</div>
 </div>
 
 <div id="profile" class="screen">
@@ -180,7 +174,7 @@ function updateUI(){
  (energy / maxEnergy * 100) + "%";
 }
 
-// офлайн восстановление энергии
+// ОФЛАЙН ВОССТАНОВЛЕНИЕ ЭНЕРГИИ
 setInterval(()=>{
  if(energy < maxEnergy){
   energy += 1;
@@ -199,4 +193,4 @@ function fullscreen(){
 </script>
 
 </body>
-</html>
+    </html>
