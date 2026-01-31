@@ -2,17 +2,13 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>NEON VOID</title>
+<title>NEON VOID MAX</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
 <style>
 html, body{
   width:100%;
   height:100%;
   margin:0;
-}
-
-body{
   background:#0b0f1a;
   color:white;
   font-family:Arial, sans-serif;
@@ -20,14 +16,12 @@ body{
   overflow:hidden;
 }
 
-/* -------- HEADER -------- */
 .header{
   font-size:28px;
   margin:10px;
   letter-spacing:2px;
 }
 
-/* -------- STATS -------- */
 .stats{
   display:flex;
   justify-content:center;
@@ -35,7 +29,6 @@ body{
   margin:10px;
 }
 
-/* -------- BUTTONS -------- */
 button{
   padding:10px 15px;
   border:none;
@@ -43,18 +36,18 @@ button{
   cursor:pointer;
 }
 
-/* -------- TAP CIRCLE (ЧИСТЫЙ — БЕЗ КВАДРАТА) -------- */
+/* ЧИСТЫЙ КРУГ — БЕЗ КВАДРАТА */
 .circle{
-  width:240px;
-  height:240px;
+  width:260px;
+  height:260px;
   border-radius:50%;
   background: radial-gradient(circle, #4fc3ff, #0a2a3f);
   margin:20px auto;
-  box-shadow:0 0 30px #4fc3ff;
+  box-shadow:0 0 40px #4fc3ff;
   cursor:pointer;
 }
 
-/* -------- PANELS -------- */
+/* Панели */
 .panel{
   display:none;
   background:#111;
@@ -65,7 +58,6 @@ button{
   text-align:left;
 }
 
-/* Крестик закрытия */
 .close{
   color:red;
   float:right;
@@ -73,7 +65,6 @@ button{
   cursor:pointer;
 }
 
-/* Fullscreen button */
 .fullscreen{
   position:fixed;
   top:10px;
@@ -86,7 +77,7 @@ button{
 
 <button class="fullscreen" onclick="goFull()">📺 Fullscreen</button>
 
-<div class="header">NEON VOID</div>
+<div class="header">NEON VOID MAX</div>
 
 <div class="stats">
   <div>💰 <span id="score">0</span></div>
@@ -109,7 +100,8 @@ button{
   <button onclick="buy('Energy III', 8000, 80)">⚡ Energy III — 8000</button><br><br>
   <button onclick="buy('Energy IV', 20000, 150)">⚡ Energy IV — 20000</button><br><br>
   <button onclick="buy('Energy V', 50000, 300)">⚡ Energy V — 50000</button><br><br>
-  <button onclick="buy('Legend Core', 250000, 600)">💎 Legend Core — 250000</button>
+  <button onclick="buyTemp('Turbo Tap', 120000, 60)">⚡ Turbo Tap (60 мин) — 120000</button><br><br>
+  <button onclick="buyTemp('Mega Regen', 200000, 120)">🔥 Mega Regen (120 мин) — 200000</button>
 </div>
 
 <!-- ПРОФИЛЬ -->
@@ -117,8 +109,6 @@ button{
   <span class="close" onclick="closeAll()">✖</span>
   <h3>Твой профиль</h3>
   <div id="profileData"></div>
-  <br>
-  <button onclick="resetLocal()">🔄 Сброс локальных данных</button>
 </div>
 
 <!-- ЛИДЕРБОРД -->
@@ -142,7 +132,7 @@ document.getElementById("score").innerText = score;
 document.getElementById("energy").innerText = energy;
 document.getElementById("maxE").innerText = maxEnergy;
 
-/* ===== ТАП ===== */
+/* ТАП */
 function tap(){
   if(energy <= 0) return;
 
@@ -154,7 +144,7 @@ function tap(){
   updateUI();
 }
 
-/* ===== СОХРАНЕНИЕ ===== */
+/* СОХРАНЕНИЕ */
 function saveLocal(){
   localStorage.setItem("score", score);
   localStorage.setItem("energy", energy);
@@ -167,15 +157,16 @@ function updateUI(){
   document.getElementById("maxE").innerText = maxEnergy;
 }
 
-/* ===== ОФЛАЙН РЕГЕН ===== */
+/* ОФЛАЙН РЕГЕН */
 setInterval(()=>{
   if(energy < maxEnergy){
     energy++;
     saveLocal();
     updateUI();
   }
-}, 30000); // +1 каждые 30 сек
+}, 30000);
 
+/* СИНХРОН */
 function sendToServer(){
   fetch(API+"/submit",{
     method:"POST",
@@ -189,12 +180,9 @@ function sendToServer(){
   });
 }
 
-/* ===== ПОКУПКА ===== */
+/* ПОКУПКИ */
 function buy(name, price, bonus){
-  if(score < price){
-    alert("Недостаточно монет!");
-    return;
-  }
+  if(score < price){ alert("Недостаточно монет!"); return; }
 
   fetch(API+"/buy",{
     method:"POST",
@@ -203,16 +191,11 @@ function buy(name, price, bonus){
       userId,
       item:name,
       price:price,
-      maxEnergyBonus:bonus
+      bonus:bonus
     })
   })
   .then(r=>r.json())
   .then(d=>{
-    if(!d.ok){
-      alert(d.msg);
-      return;
-    }
-
     score = d.newScore;
     maxEnergy = d.newMax;
     energy = maxEnergy;
@@ -222,7 +205,30 @@ function buy(name, price, bonus){
   });
 }
 
-/* ===== ПАНЕЛИ ===== */
+/* ВРЕМЕННЫЕ БУСТЫ */
+function buyTemp(name, price, minutes){
+  if(score < price){ alert("Недостаточно монет!"); return; }
+
+  fetch(API+"/buy",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      userId,
+      item:name,
+      price:price,
+      tempMinutes:minutes
+    })
+  })
+  .then(r=>r.json())
+  .then(()=>{
+    score -= price;
+    saveLocal();
+    updateUI();
+    alert("Активирован временный буст: "+name);
+  });
+}
+
+/* ПАНЕЛИ */
 function closeAll(){
   document.getElementById("shop").style.display="none";
   document.getElementById("profile").style.display="none";
@@ -245,8 +251,9 @@ function openProfile(){
         👤 Ник: ${d.username}<br>
         💰 Очки: ${d.score}<br>
         ⚡ Энергия: ${d.energy}/${d.maxEnergy}<br>
-        🏆 Место: #${d.rank}<br><br>
-        🔥 Бусты:<br> ${d.boosts.join("<br>") || "Нет"}
+        🏆 Место: #${d.rank}<br>
+        🔥 Бусты: ${d.boosts.join(", ") || "нет"}<br>
+        ⏱ Последний вход: ${new Date(d.lastActive).toLocaleString()}
       `;
     });
 }
@@ -266,18 +273,11 @@ function openLeaders(){
     });
 }
 
-/* ===== FULLSCREEN (ИСПРАВЛЕННЫЙ) ===== */
+/* FULLSCREEN */
 function goFull(){
   const el = document.documentElement;
   if (el.requestFullscreen) el.requestFullscreen();
   else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
-}
-
-/* ===== СБРОС (если нужно) ===== */
-function resetLocal(){
-  localStorage.clear();
-  location.reload();
 }
 </script>
 
