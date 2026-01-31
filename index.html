@@ -2,47 +2,51 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<title>NEON VOID</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON VOID – Energy Game</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:radial-gradient(circle at center,#0a1a2f,#000);
-  color:#fff;
-  text-align:center;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #081c2f, #000);
+  color: white;
+  text-align: center;
 }
-h1{letter-spacing:4px;margin-top:20px}
-.top{margin:10px;font-size:18px}
-.btns button{
-  margin:5px;
-  padding:10px 18px;
-  border-radius:20px;
-  border:none;
-  cursor:pointer;
+
+h1 {
+  margin-top: 20px;
+  letter-spacing: 3px;
 }
-#orb{
-  width:220px;
-  height:220px;
-  border-radius:50%;
-  margin:40px auto;
-  background:radial-gradient(circle,#4fc3ff,#0288d1);
-  box-shadow:0 0 40px #4fc3ff;
+
+.stats {
+  margin: 10px 0;
+  font-size: 18px;
 }
-.hidden{display:none}
-.panel{
-  max-width:300px;
-  margin:20px auto;
-  background:#111;
-  padding:15px;
-  border-radius:15px;
+
+button {
+  margin: 5px;
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
 }
-.item{
-  background:#222;
-  margin:8px 0;
-  padding:10px;
-  border-radius:10px;
+
+#tap {
+  margin: 40px auto;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #4fc3ff, #0a2a3f);
+  box-shadow: 0 0 60px #4fc3ff;
+}
+
+.panel {
+  margin: 20px auto;
+  max-width: 300px;
+  padding: 15px;
+  background: rgba(0,0,0,.6);
+  border-radius: 15px;
 }
 </style>
 </head>
@@ -51,157 +55,125 @@ h1{letter-spacing:4px;margin-top:20px}
 
 <h1>NEON VOID</h1>
 
-<div class="top">
-💰 <span id="coins">0</span>
-&nbsp;&nbsp;⚡ <span id="energy">0</span>/<span id="maxEnergy">100</span>
+<div class="stats">
+  💰 <span id="score">0</span>
+  ⚡ <span id="energy">100/100</span>
 </div>
 
-<div class="btns">
-<button onclick="show('shop')">🛒 Магазин</button>
-<button onclick="show('profile')">👤 Профиль</button>
-<button onclick="show('leader')">🏆 Лидерборд</button>
+<div>
+  <button onclick="openShop()">🛒 Магазин</button>
+  <button onclick="openProfile()">👤 Профиль</button>
+  <button onclick="openLeaderboard()">🏆 Лидерборд</button>
 </div>
 
-<div id="orb" onclick="tap()"></div>
+<div id="tap"></div>
 
-<div id="shop" class="panel hidden">
-<h3>Магазин</h3>
-<div class="item">
-+1 к тапу — 500 💰
-<button onclick="buyTap()">Купить</button>
-</div>
-<div class="item">
-+50 энергии — 1000 💰
-<button onclick="buyEnergy()">Купить</button>
-</div>
-</div>
-
-<div id="profile" class="panel hidden">
-<h3>Профиль</h3>
-Имя: <b id="pname"></b><br>
-Тап/клик: <b id="tapPower"></b>
-</div>
-
-<div id="leader" class="panel hidden">
-<h3>Лидерборд</h3>
-<div id="leaderList">Загрузка…</div>
-</div>
+<div id="panel" class="panel" style="display:none"></div>
 
 <script>
-/* === SERVER === */
-const SERVER = "https://neon-void-l.onrender.com";
+const SERVER_URL = "https://neon-void-2.onrender.com";
 
-/* === LOAD SAVE === */
-let save = JSON.parse(localStorage.getItem("neonSave")) || {
-  coins:0,
-  energy:100,
-  maxEnergy:100,
-  tapPower:1,
-  name:null
+/* ===== СОХРАНЕНИЕ ===== */
+let score = Number(localStorage.getItem("score")) || 0;
+let energy = Number(localStorage.getItem("energy")) || 100;
+let maxEnergy = Number(localStorage.getItem("maxEnergy")) || 100;
+let name = localStorage.getItem("name") || "Player";
+
+function save() {
+  localStorage.setItem("score", score);
+  localStorage.setItem("energy", energy);
+  localStorage.setItem("maxEnergy", maxEnergy);
+  localStorage.setItem("name", name);
+}
+
+function updateUI() {
+  scoreEl.innerText = score;
+  energyEl.innerText = `${energy}/${maxEnergy}`;
+}
+
+const scoreEl = document.getElementById("score");
+const energyEl = document.getElementById("energy");
+
+/* ===== ТАП ===== */
+document.getElementById("tap").onclick = () => {
+  if (energy <= 0) return;
+  score++;
+  energy--;
+  save();
+  updateUI();
 };
 
-if(!save.name){
-  save.name = "Player" + Math.floor(Math.random()*9999);
-}
-
-let {coins,energy,maxEnergy,tapPower,name} = save;
-
-/* === UI === */
-const coinsEl = document.getElementById("coins");
-const energyEl = document.getElementById("energy");
-const maxEnergyEl = document.getElementById("maxEnergy");
-const pname = document.getElementById("pname");
-const tapPowerEl = document.getElementById("tapPower");
-const leaderList = document.getElementById("leaderList");
-
-function updateUI(){
-  coinsEl.textContent = coins;
-  energyEl.textContent = energy;
-  maxEnergyEl.textContent = maxEnergy;
-  pname.textContent = name;
-  tapPowerEl.textContent = tapPower;
-}
-updateUI();
-
-/* === SAVE === */
-function saveGame(){
-  localStorage.setItem("neonSave",JSON.stringify({
-    coins,energy,maxEnergy,tapPower,name
-  }));
-}
-
-/* === TAP === */
-function tap(){
-  if(energy<=0) return;
-  coins += tapPower;
-  energy -= 1;
-  updateUI();
-  saveGame();
-  sendScore();
-}
-
-/* === ENERGY REGEN === */
-setInterval(()=>{
-  if(energy<maxEnergy){
+/* ===== РЕГЕН ===== */
+setInterval(() => {
+  if (energy < maxEnergy) {
     energy++;
+    save();
     updateUI();
-    saveGame();
   }
-},3000);
+}, 3000);
 
-/* === SHOP === */
-function buyTap(){
-  if(coins>=500){
-    coins-=500;
-    tapPower++;
-    updateUI();
-    saveGame();
-  }
-}
-function buyEnergy(){
-  if(coins>=1000){
-    coins-=1000;
-    maxEnergy+=50;
-    energy=maxEnergy;
-    updateUI();
-    saveGame();
-  }
-}
-
-/* === PANELS === */
-function show(id){
-  ["shop","profile","leader"].forEach(x=>{
-    document.getElementById(x).classList.add("hidden");
-  });
-  document.getElementById(id).classList.remove("hidden");
-  if(id==="leader") loadLeaderboard();
-}
-
-/* === LEADERBOARD === */
-function sendScore(){
-  fetch(SERVER+"/submit",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({name:name,score:coins})
-  }).catch(()=>{});
-}
-
-async function loadLeaderboard(){
-  try{
-    const r = await fetch(SERVER+"/top");
-    const d = await r.json();
-    leaderList.innerHTML="";
-    d.forEach((p,i)=>{
-      const div=document.createElement("div");
-      div.className="item";
-      div.textContent=`${i+1}. ${p.name} — ${p.score}`;
-      leaderList.appendChild(div);
+/* ===== СЕРВЕР ===== */
+async function sendScore() {
+  try {
+    await fetch(SERVER_URL + "/submit", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ name, score })
     });
-  }catch{
-    leaderList.innerHTML="Сервер недоступен";
+  } catch {}
+}
+setInterval(sendScore, 10000);
+
+/* ===== МЕНЮ ===== */
+const panel = document.getElementById("panel");
+
+function openShop() {
+  panel.style.display = "block";
+  panel.innerHTML = `
+    <h3>Магазин</h3>
+    <button onclick="buyEnergy()">+50 энергии (500)</button>
+  `;
+}
+
+function buyEnergy() {
+  if (score >= 500) {
+    score -= 500;
+    maxEnergy += 50;
+    energy = maxEnergy;
+    save();
+    updateUI();
+    alert("Куплено!");
   }
 }
-</script>
 
+function openProfile() {
+  panel.style.display = "block";
+  panel.innerHTML = `
+    <h3>Профиль</h3>
+    <input id="nick" placeholder="Ник" value="${name}">
+    <button onclick="saveNick()">Сохранить</button>
+  `;
+}
+
+function saveNick() {
+  name = document.getElementById("nick").value || "Player";
+  save();
+}
+
+async function openLeaderboard() {
+  panel.style.display = "block";
+  panel.innerHTML = "Загрузка...";
+  try {
+    const r = await fetch(SERVER_URL + "/top");
+    const d = await r.json();
+    panel.innerHTML = "<h3>Лидерборд</h3>" +
+      d.map((p,i)=>`${i+1}. ${p.name} — ${p.score}`).join("<br>");
+  } catch {
+    panel.innerText = "Сервер недоступен";
+  }
+}
+
+updateUI();
+</script>
 </body>
 </html>
