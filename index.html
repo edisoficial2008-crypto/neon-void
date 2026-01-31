@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON VOID — Energy Game</title>
+<title>NEON VOID</title>
 
 <style>
 * { box-sizing: border-box; font-family: system-ui, sans-serif; }
@@ -16,9 +16,9 @@ body {
 }
 
 .header {
-  padding: 14px;
   text-align: center;
-  background: rgba(0,0,0,.45);
+  padding: 14px;
+  background: rgba(0,0,0,.5);
 }
 
 .stats {
@@ -36,7 +36,6 @@ body {
 }
 
 .nav button {
-  background: #fff;
   border: none;
   border-radius: 14px;
   padding: 10px 18px;
@@ -45,23 +44,25 @@ body {
 }
 
 .tap-zone {
+  position: relative;
   height: calc(100vh - 200px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .tap-circle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: 240px;
   height: 240px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #5ff6ff, #007bff);
-  box-shadow: 0 0 30px #4cf, 0 0 80px #06f;
+  box-shadow: 0 0 40px #4cf, 0 0 120px #06f;
   cursor: pointer;
-  transition: transform .08s ease;
+  user-select: none;
 }
 
-.tap-circle:active { transform: scale(0.94); }
+.tap-circle:active { transform: translate(-50%, -50%) scale(0.95); }
 
 .float {
   position: absolute;
@@ -77,10 +78,11 @@ body {
   to { opacity: 0; transform: translateY(-60px); }
 }
 
+/* MODALS */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.88);
+  background: rgba(0,0,0,.9);
   display: none;
   padding: 20px;
   overflow-y: auto;
@@ -91,22 +93,10 @@ body {
   margin: auto;
 }
 
-.close { font-size: 28px; cursor: pointer; margin-bottom: 10px; }
-
-.shop-item {
-  background: rgba(255,255,255,.08);
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 12px;
-}
-
-.shop-item button {
-  margin-top: 8px;
-  width: 100%;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
+.close {
+  font-size: 28px;
   cursor: pointer;
+  margin-bottom: 10px;
 }
 </style>
 </head>
@@ -117,7 +107,7 @@ body {
   <h2>NEON VOID</h2>
   <div class="stats">
     <div>💰 <span id="coins">0</span></div>
-    <div>⚡ <span id="energy">4000</span>/4000</div>
+    <div>⚡ <span id="energy">0</span>/<span id="maxEnergy">0</span></div>
   </div>
 </div>
 
@@ -136,21 +126,7 @@ body {
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✕</div>
     <h2>Магазин</h2>
-
-    <div class="shop-item">
-      +1 к тапу — 500
-      <button onclick="buyTap(1,500)">Купить</button>
-    </div>
-
-    <div class="shop-item">
-      +5 к тапу — 5000
-      <button onclick="buyTap(5,5000)">Купить</button>
-    </div>
-
-    <div class="shop-item">
-      Макс энергия +1000 — 15000
-      <button onclick="buyEnergy()">Купить</button>
-    </div>
+    <button onclick="buyTap()">+1 к тапу (1000)</button>
   </div>
 </div>
 
@@ -158,10 +134,8 @@ body {
 <div class="modal" id="profile">
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✕</div>
-    <h2>Профиль</h2>
     <p>Очки: <span id="pCoins"></span></p>
     <p>Сила тапа: <span id="pTap"></span></p>
-    <p>Макс энергия: <span id="pMax"></span></p>
   </div>
 </div>
 
@@ -169,44 +143,38 @@ body {
 <div class="modal" id="leader">
   <div class="modal-content">
     <div class="close" onclick="closeModal()">✕</div>
-    <h2>Лидерборд</h2>
     <p>Скоро онлайн</p>
   </div>
 </div>
 
 <script>
-/* ===== LOAD ===== */
-let data = JSON.parse(localStorage.getItem("neon_void")) || {
-  coins: 0,
-  energy: 4000,
-  maxEnergy: 4000,
-  tapPower: 1
-};
+/* SAFE LOAD */
+const saved = JSON.parse(localStorage.getItem("neon_void")) || {};
 
-let { coins, energy, maxEnergy, tapPower } = data;
+let coins = Number(saved.coins) || 0;
+let energy = Number(saved.energy) || 4000;
+let maxEnergy = Number(saved.maxEnergy) || 4000;
+let tapPower = Number(saved.tapPower) || 1;
 
-/* ===== SAVE ===== */
 function save() {
   localStorage.setItem("neon_void", JSON.stringify({
     coins, energy, maxEnergy, tapPower
   }));
 }
 
-/* ===== TAP ===== */
 function tap(e) {
   if (energy <= 0) return;
   coins += tapPower;
-  energy--;
+  energy -= 1;
   spawnFloat(e);
   update();
   save();
 }
 
-/* ===== UI ===== */
 function spawnFloat(e) {
   const f = document.createElement("div");
   f.className = "float";
-  f.innerText = "+" + tapPower;
+  f.textContent = "+" + tapPower;
   f.style.left = e.clientX + "px";
   f.style.top = e.clientY + "px";
   document.body.appendChild(f);
@@ -216,32 +184,20 @@ function spawnFloat(e) {
 function update() {
   coinsEl.textContent = coins;
   energyEl.textContent = energy;
+  maxEnergyEl.textContent = maxEnergy;
   pCoins.textContent = coins;
   pTap.textContent = tapPower;
-  pMax.textContent = maxEnergy;
 }
 
-/* ===== SHOP ===== */
-function buyTap(p, price) {
-  if (coins >= price) {
-    coins -= price;
-    tapPower += p;
+function buyTap() {
+  if (coins >= 1000) {
+    coins -= 1000;
+    tapPower++;
     update();
     save();
   }
 }
 
-function buyEnergy() {
-  if (coins >= 15000) {
-    coins -= 15000;
-    maxEnergy += 1000;
-    energy = maxEnergy;
-    update();
-    save();
-  }
-}
-
-/* ===== MODALS ===== */
 function openModal(id) {
   document.getElementById(id).style.display = "block";
 }
@@ -249,12 +205,11 @@ function closeModal() {
   document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
 }
 
-/* ===== INIT ===== */
 const coinsEl = document.getElementById("coins");
 const energyEl = document.getElementById("energy");
+const maxEnergyEl = document.getElementById("maxEnergy");
 const pCoins = document.getElementById("pCoins");
 const pTap = document.getElementById("pTap");
-const pMax = document.getElementById("pMax");
 
 update();
 </script>
