@@ -1,69 +1,213 @@
-import requests
-from aiogram import Bot, Dispatcher, executor, types
+import asyncio
+import sqlite3
+import time
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-BOT_TOKEN = "8485189326:AAEezz5u6ktCSQw4i1jVcPKCzHnPCnmcBMo"
-API_URL = "https://neon-void-1.onrender.com"
+TOKEN = "ТВОЙ_ТОКЕН_БОТА_СЮДА"
 
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher(bot)
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
-# /start
-@dp.message_handler(commands=["start"])
-async def start(message: types.Message):
-    tg_id = message.from_user.id
-    name = message.from_user.first_name
+# ======== БАЗА ДАННЫХ ========
+db = sqlite3.connect("game.db", check_same_thread=False)
+cur = db.cursor()
 
-    data = {
-        "tg_id": tg_id,
-        "name": name,
-        "data": {
-            "coins": 0
-        }
-    }
+cur.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER PRIMARY KEY,
+    username TEXT,
+    points INTEGER DEFAULT 0,
+    energy INTEGER DEFAULT 4000,
+    last_regen INTEGER,
+    level INTEGER DEFAULT 1,
+    boosts INTEGER DEFAULT 0
+)
+""")
+db.commit()
 
-    requests.post(f"{API_URL}/save", json=data)
+MAX_ENERGY = 4000
+REGEN_INTERVAL = 1800   # 30 минут
+REGEN_AMOUNT = 200      # +200 энергии каждые 30 минут
 
-    await message.answer(
-        "🎮 Добро пожаловать!\n\n"
-        "Команды:\n"
-        "/profile — профиль\n"
-        "/leaderboard — топ игроков"
+# ======== КЛАВИАТУРЫ ========
+
+def main_menu():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎮 Играть", callback_data="tap")],
+        [
+            InlineKeyboardButton(text="🛒 Магазин", callback_data="shop"),
+            InlineKeyboardButton(text="👤 Профиль", callback_data="profile")
+        ],
+        [InlineKeyboardButton(text="🏆 Лидерборд", callback_data="leaderboard")]
+    ])
+
+def shop_menu():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⚡ +500 энергии (5 000 очков)", callback_data="buy_energy")],
+        [InlineKeyboardButton(text="🚀 Буст x2 (50 000 очков)", callback_data="buy_boost")],
+        [InlineKeyboardButton(text="💎 Премиум (300 000 очков)", callback_data="buy_premium")],
+        [InlineKeyboardButton(text="🌌 Легенда (1 500 000 очков)", callback_data="buy_legend")],
+        [InlineKeyboardButton(text="⬅ Назад", callback_data="back")]
+    ])
+
+# ======== ФУНКЦИИ ИГРЫ ========
+
+def get_user(uid, username):
+    cur.execute("SELECT * FROM users WHERE user_id=?", (uid,))
+    user = cur.fetchone()
+    if not user:
+        cur.execute(
+            "INSERT INTO users (user_id, username, last_regen) VALUES (?, ?, ?)",
+            (uid, username, int(time.time()))
+        )
+        db.commit()
+        return get_user(uid, username)
+    return user
+
+def regen_energy(uid):
+    cur.execute("SELECT energy, last_regen FROM users WHERE user_id=?", (uid,))
+    energy, last = cur.fetchone()
+    now = int(time.time())
+
+    passed = now - last
+    steps = passed // REGEN_INTERVAL
+
+    if steps > 0 and energy < MAX_ENERGY:
+        new_energy = min(MAX_ENERGY, energy + steps * REGEN_AMOUNT)
+        cur.execute(
+            "UPDATE users SET energy=?, last_regen=? WHERE user_id=?",
+            (new_energy, now, uid)
+        )
+        db.commit()
+
+# ======== ХЕНДЛЕРЫ ========
+
+@dp.message(Command("start"))
+async def start(msg: types.Message):
+    get_user(msg.from_user.id, msg.from_user.username or "Player")
+    await msg.answer(
+        "🔥 **NEON VOID BOT** 🔥\n"
+        "Тапай, качайся, соревнуйся!\n",
+        reply_markup=main_menu(),
+        parse_mode="Markdown"
     )
 
-# /profile
-@dp.message_handler(commands=["profile"])
-async def profile(message: types.Message):
-    tg_id = message.from_user.id
+@dp.callback_query()
+async def callbacks(call: types.CallbackQuery):
+    uid = call.from_user.id
+    uname = call.from_user.username or "Player"
 
-    r = requests.get(f"{API_URL}/load/{tg_id}")
-    player = r.json()
+    get_user(uid, uname)
+    regen_energy(uid)
 
-    if not player:
-        await message.answer("❌ Профиль не найден")
-        return
+    cur.execute("SELECT points, energy, level, boosts FROM users WHERE user_id=?", (uid,))
+    points, energy, level, boosts = cur.fetchone()
 
-    coins = player["data"].get("coins", 0)
+    # ===== ТАП =====
+    if call.data == "tap":
+        if energy >= 10:
+            cur.execute(
+                "UPDATE users SET points = points + 10, energy = energy - 10 WHERE user_id=?",
+                (uid,)
+            )
+            db.commit()
+            await call.answer("💥 +10 очков!")
+        else:
+            await call.answer("⚠ Нет энергии!")
 
-    await message.answer(
-        f"👤 Профиль\n"
-        f"💰 Монеты: {coins}"
-    )
+        await call.message.edit_text(
+            f"🎮 **Игра**\n"
+            f"⚡ Энергия: {energy}/4000\n"
+            f"💰 Очки: {points}\n"
+            f"⭐ Уровень: {level}",
+            reply_markup=main_menu(),
+            parse_mode="Markdown"
+        )
 
-# /leaderboard
-@dp.message_handler(commands=["leaderboard"])
-async def leaderboard(message: types.Message):
-    r = requests.get(f"{API_URL}/leaderboard")
-    top = r.json()
+    # ===== МАГАЗИН =====
+    elif call.data == "shop":
+        await call.message.edit_text("🛒 **Магазин** — покупки рассчитаны на долгую игру:", 
+                                     reply_markup=shop_menu())
 
-    if not top:
-        await message.answer("Топ пуст 😴")
-        return
+    elif call.data == "buy_energy":
+        if points >= 5000:
+            cur.execute(
+                "UPDATE users SET points = points - 5000, energy = MIN(4000, energy + 500) WHERE user_id=?",
+                (uid,)
+            )
+            db.commit()
+            await call.answer("⚡ +500 энергии!")
+        else:
+            await call.answer("❌ Не хватает очков!")
 
-    text = "🏆 ТОП ИГРОКОВ:\n\n"
-    for i, p in enumerate(top, 1):
-        text += f"{i}. {p['name']} — {p['coins']} 💰\n"
+    elif call.data == "buy_boost":
+        if points >= 50000:
+            cur.execute(
+                "UPDATE users SET points = points - 50000, boosts = boosts + 1 WHERE user_id=?",
+                (uid,)
+            )
+            db.commit()
+            await call.answer("🚀 Куплен буст x2!")
+        else:
+            await call.answer("❌ Не хватает очков!")
 
-    await message.answer(text)
+    elif call.data == "buy_premium":
+        if points >= 300000:
+            cur.execute(
+                "UPDATE users SET points = points - 300000, level = level + 5 WHERE user_id=?",
+                (uid,)
+            )
+            db.commit()
+            await call.answer("💎 Премиум активирован!")
+        else:
+            await call.answer("❌ Не хватает очков!")
+
+    elif call.data == "buy_legend":
+        if points >= 1500000:
+            cur.execute(
+                "UPDATE users SET points = points - 1500000, level = level + 20 WHERE user_id=?",
+                (uid,)
+            )
+            db.commit()
+            await call.answer("🌌 Ты легенда игры!")
+        else:
+            await call.answer("❌ Не хватает очков!")
+
+    # ===== ПРОФИЛЬ =====
+    elif call.data == "profile":
+        await call.message.edit_text(
+            f"👤 **ТВОЙ ПРОФИЛЬ**\n"
+            f"Имя: @{uname}\n"
+            f"⭐ Уровень: {level}\n"
+            f"💰 Очки: {points}\n"
+            f"⚡ Энергия: {energy}/4000\n"
+            f"🚀 Бусты: {boosts}\n"
+            f"🎯 Прогресс сохраняется автоматически!\n",
+            reply_markup=main_menu(),
+            parse_mode="Markdown"
+        )
+
+    # ===== ЛИДЕРБОРД =====
+    elif call.data == "leaderboard":
+        cur.execute("SELECT username, points FROM users ORDER BY points DESC LIMIT 10")
+        top = cur.fetchall()
+
+        text = "🏆 **ТОП-10 ИГРОКОВ** 🏆\n\n"
+        for i, (name, pts) in enumerate(top, 1):
+            text += f"{i}. @{name} — {pts} очков\n"
+
+        await call.message.edit_text(text, reply_markup=main_menu())
+
+    elif call.data == "back":
+        await call.message.edit_text(
+            "🔥 **NEON VOID BOT** 🔥",
+            reply_markup=main_menu()
+        )
+
+async def main():
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    executor.start_polling(dp)
+    asyncio.run(main())
