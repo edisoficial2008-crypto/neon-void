@@ -56,11 +56,11 @@ text-align:left
 .close{float:right;font-size:20px;cursor:pointer}
 .item{
 background:#141f46;
-padding:12px;
-margin:10px 0;
-border-radius:14px;
-cursor:pointer
+padding:10px;
+margin:8px 0;
+border-radius:12px
 }
+.you{background:#1f3cff}
 hr{border:0;height:1px;background:#223;margin:10px 0}
 </style>
 </head>
@@ -77,6 +77,7 @@ hr{border:0;height:1px;background:#223;margin:10px 0}
 <div class="buttons">
 <button class="btn" onclick="openModal('shop')">🛒 Магазин</button>
 <button class="btn" onclick="openModal('profile')">👤 Профиль</button>
+<button class="btn" onclick="openModal('leaderboard')">🏆 Топ</button>
 </div>
 
 <div id="tap" onclick="tap()"></div>
@@ -86,28 +87,19 @@ hr{border:0;height:1px;background:#223;margin:10px 0}
 <div class="box">
 <span class="close" onclick="closeModal('shop')">✕</span>
 <h3>Магазин</h3>
-
-<div class="item" onclick="buyTap()">⚡ Сила тапа +1<br>Цена: <span id="tapPrice"></span></div>
-<div class="item" onclick="buyEnergy()">🔋 Макс энергия +500<br>Цена: <span id="energyPrice"></span></div>
-
+<div class="item" onclick="buyTap()">⚡ Сила тапа +1 — <span id="tapPrice"></span></div>
+<div class="item" onclick="buyEnergy()">🔋 Макс энергия +500 — <span id="energyPrice"></span></div>
 <hr>
-
-<div class="item" onclick="buyAuto()">🤖 Автотап +1/сек<br>Цена: <span id="autoPrice"></span></div>
-<div class="item" onclick="buyBonus()">💎 Бонус +10%<br>Цена: <span id="bonusPrice"></span></div>
-
+<div class="item" onclick="buyAuto()">🤖 Автотап +1/сек — <span id="autoPrice"></span></div>
+<div class="item" onclick="buyBonus()">💎 Бонус +10% — <span id="bonusPrice"></span></div>
 <hr>
-
-<div class="item" onclick="buyCore()">🧬 VOID CORE (x1.1 навсегда)<br>Цена: <span id="corePrice"></span></div>
-<div class="item" onclick="buyReactor()">☢ REACTOR (+1 реген)<br>Цена: <span id="reactorPrice"></span></div>
-
+<div class="item" onclick="buyCore()">🧬 VOID CORE x1.1 — <span id="corePrice"></span></div>
+<div class="item" onclick="buyReactor()">☢ REACTOR +1 реген — <span id="reactorPrice"></span></div>
 <hr>
-
-<div class="item" onclick="buyMatrix()">🛰 MATRIX (+5% ко всему)<br>Цена: <span id="matrixPrice"></span></div>
-<div class="item" onclick="buyOverdrive()">🔥 OVERDRIVE (x2 автотап)<br>Цена: <span id="overdrivePrice"></span></div>
-
+<div class="item" onclick="buyMatrix()">🛰 MATRIX +5% — <span id="matrixPrice"></span></div>
+<div class="item" onclick="buyOverdrive()">🔥 OVERDRIVE x2 авто — <span id="overdrivePrice"></span></div>
 <hr>
-
-<div class="item" onclick="buyAscension()">🌌 ASCENSION (престиж)<br>Цена: <span id="ascPrice"></span></div>
+<div class="item" onclick="buyAscension()">🌌 ASCENSION — <span id="ascPrice"></span></div>
 </div>
 </div>
 
@@ -117,14 +109,23 @@ hr{border:0;height:1px;background:#223;margin:10px 0}
 <span class="close" onclick="closeModal('profile')">✕</span>
 <h3>Профиль</h3>
 <p>Монеты: <span id="pCoins"></span></p>
-<p>Тапов всего: <span id="pTaps"></span></p>
+<p>Тапов: <span id="pTaps"></span></p>
 <p>Сила тапа: <span id="pTap"></span></p>
 <p>Автотап: <span id="pAuto"></span>/сек</p>
 <p>Бонус: <span id="pBonus"></span>%</p>
-<p>Множитель ядра: x<span id="pCore"></span></p>
-<p>Реген энергии: <span id="pRegen"></span>/сек</p>
+<p>Ядро: x<span id="pCore"></span></p>
+<p>Реген: <span id="pRegen"></span>/сек</p>
 <p>Matrix: <span id="pMatrix"></span></p>
 <p>Ascension: <span id="pAsc"></span></p>
+</div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="modal" id="leaderboard">
+<div class="box">
+<span class="close" onclick="closeModal('leaderboard')">✕</span>
+<h3>🏆 Лидерборд</h3>
+<div id="lb"></div>
 </div>
 </div>
 
@@ -133,38 +134,21 @@ hr{border:0;height:1px;background:#223;margin:10px 0}
 function L(k,d){const v=parseFloat(localStorage.getItem(k));return isNaN(v)?d:v}
 function S(k,v){localStorage.setItem(k,String(v))}
 
-let coins=L("coins",0)
-let energyMax=L("energyMax",4000)
-let energy=L("energy",energyMax)
-let tapPower=L("tapPower",1)
-let taps=L("taps",0)
-let auto=L("auto",0)
-let bonus=L("bonus",0)
-let core=L("core",1)
-let regen=L("regen",1)
-let matrix=L("matrix",0)
-let overdrive=L("overdrive",0)
-let asc=L("asc",0)
+let coins=L("coins",0),energyMax=L("energyMax",4000),energy=L("energy",energyMax)
+let tapPower=L("tapPower",1),taps=L("taps",0),auto=L("auto",0)
+let bonus=L("bonus",0),core=L("core",1),regen=L("regen",1)
+let matrix=L("matrix",0),overdrive=L("overdrive",0),asc=L("asc",0)
 
-let tapPrice=L("tapPrice",200)
-let energyPrice=L("energyPrice",800)
-let autoPrice=L("autoPrice",8000)
-let bonusPrice=L("bonusPrice",20000)
-let corePrice=L("corePrice",250000)
-let reactorPrice=L("reactorPrice",500000)
-let matrixPrice=L("matrixPrice",1000000)
-let overdrivePrice=L("overdrivePrice",2000000)
+let tapPrice=L("tapPrice",200),energyPrice=L("energyPrice",800)
+let autoPrice=L("autoPrice",8000),bonusPrice=L("bonusPrice",20000)
+let corePrice=L("corePrice",250000),reactorPrice=L("reactorPrice",500000)
+let matrixPrice=L("matrixPrice",1000000),overdrivePrice=L("overdrivePrice",2000000)
 let ascPrice=5000000
 
 function save(){
-S("coins",coins);S("energy",energy);S("energyMax",energyMax)
-S("tapPower",tapPower);S("taps",taps);S("auto",auto)
-S("bonus",bonus);S("core",core);S("regen",regen)
-S("matrix",matrix);S("overdrive",overdrive);S("asc",asc)
-S("tapPrice",tapPrice);S("energyPrice",energyPrice)
-S("autoPrice",autoPrice);S("bonusPrice",bonusPrice)
-S("corePrice",corePrice);S("reactorPrice",reactorPrice)
-S("matrixPrice",matrixPrice);S("overdrivePrice",overdrivePrice)
+["coins","energy","energyMax","tapPower","taps","auto","bonus","core","regen",
+"matrix","overdrive","asc","tapPrice","energyPrice","autoPrice","bonusPrice",
+"corePrice","reactorPrice","matrixPrice","overdrivePrice"].forEach(k=>S(k,eval(k)))
 }
 
 function update(){
@@ -192,6 +176,8 @@ pCore.textContent=core.toFixed(2)
 pRegen.textContent=regen
 pMatrix.textContent=matrix?"ДА":"НЕТ"
 pAsc.textContent=asc?"ДА":"НЕТ"
+
+updateLeaderboard()
 }
 
 function tap(){
@@ -204,21 +190,35 @@ taps++
 save();update()
 }
 
-function buyTap(){if(coins<tapPrice)return;coins-=tapPrice;tapPower++;tapPrice=Math.floor(tapPrice*1.6);save();update()}
-function buyEnergy(){if(coins<energyPrice)return;coins-=energyPrice;energyMax+=500;energy=energyMax;energyPrice=Math.floor(energyPrice*1.7);save();update()}
-function buyAuto(){if(coins<autoPrice)return;coins-=autoPrice;auto++;autoPrice=Math.floor(autoPrice*2);save();update()}
-function buyBonus(){if(coins<bonusPrice)return;coins-=bonusPrice;bonus+=10;bonusPrice=Math.floor(bonusPrice*2.3);save();update()}
-function buyCore(){if(coins<corePrice)return;coins-=corePrice;core*=1.1;corePrice=Math.floor(corePrice*3);save();update()}
-function buyReactor(){if(coins<reactorPrice)return;coins-=reactorPrice;regen++;reactorPrice=Math.floor(reactorPrice*3.5);save();update()}
+function buyTap(){if(coins<tapPrice)return;coins-=tapPrice;tapPower++;tapPrice*=1.6|0;save();update()}
+function buyEnergy(){if(coins<energyPrice)return;coins-=energyPrice;energyMax+=500;energy=energyMax;energyPrice*=1.7|0;save();update()}
+function buyAuto(){if(coins<autoPrice)return;coins-=autoPrice;auto++;autoPrice*=2|0;save();update()}
+function buyBonus(){if(coins<bonusPrice)return;coins-=bonusPrice;bonus+=10;bonusPrice*=2.3|0;save();update()}
+function buyCore(){if(coins<corePrice)return;coins-=corePrice;core*=1.1;corePrice*=3|0;save();update()}
+function buyReactor(){if(coins<reactorPrice)return;coins-=reactorPrice;regen++;reactorPrice*=3.5|0;save();update()}
 function buyMatrix(){if(matrix||coins<matrixPrice)return;coins-=matrixPrice;matrix=1;save();update()}
 function buyOverdrive(){if(overdrive||coins<overdrivePrice)return;coins-=overdrivePrice;overdrive=1;auto*=2;save();update()}
 function buyAscension(){if(asc||coins<ascPrice)return;asc=1;core*=2;auto+=10;save();update()}
 
-setInterval(()=>{
-coins+=auto*core
-energy=Math.min(energyMax,energy+regen)
-update()
-},1000)
+setInterval(()=>{coins+=auto*core;energy=Math.min(energyMax,energy+regen);update()},1000)
+
+/* ===== LEADERBOARD ===== */
+function updateLeaderboard(){
+let list=JSON.parse(localStorage.getItem("lb")||"[]")
+list=list.filter(x=>x.id!=="you")
+list.push({id:"you",score:coins})
+list.sort((a,b)=>b.score-a.score)
+list=list.slice(0,10)
+localStorage.setItem("lb",JSON.stringify(list))
+
+lb.innerHTML=""
+list.forEach((p,i)=>{
+let d=document.createElement("div")
+d.className="item"+(p.id==="you"?" you":"")
+d.textContent=`${i+1}. ${p.id==="you"?"YOU":"Player"} — ${p.score}`
+lb.appendChild(d)
+})
+}
 
 function openModal(id){document.getElementById(id).style.display="flex"}
 function closeModal(id){document.getElementById(id).style.display="none"}
@@ -245,6 +245,7 @@ const pCore=document.getElementById("pCore")
 const pRegen=document.getElementById("pRegen")
 const pMatrix=document.getElementById("pMatrix")
 const pAsc=document.getElementById("pAsc")
+const lb=document.getElementById("lb")
 
 update()
 </script>
