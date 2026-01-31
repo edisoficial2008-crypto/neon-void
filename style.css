@@ -1,96 +1,52 @@
-* {
+body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   font-family: Arial, sans-serif;
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at top, #2b0036, #050008);
+  background: radial-gradient(circle, #0a1a3a, #000);
   color: white;
-  overflow: hidden;
+  text-align: center;
 }
 
-/* HEADER */
-.header {
+.top {
   padding: 15px;
 }
 
-.title {
-  font-size: 26px;
-  font-weight: bold;
-}
-
-.stats {
-  opacity: 0.8;
-}
-
-/* TAP ZONE */
-#tapZone {
-  position: absolute;
-  top: 90px;
-  bottom: 80px;
-  left: 0;
-  right: 0;
-}
-
-/* TAP NUMBERS */
-.tap-number {
-  position: absolute;
-  font-size: 20px;
-  color: #8ffcff;
-  pointer-events: none;
-  animation: fly 1s forwards;
-}
-
-@keyframes fly {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-40px); }
-}
-
-/* BOTTOM MENU */
-.bottom-menu {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 70px;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.bottom-menu button {
-  background: none;
+.buttons button {
+  margin: 5px;
+  padding: 10px 20px;
+  border-radius: 20px;
   border: none;
-  font-size: 24px;
-  color: white;
 }
 
-/* MODAL */
-.modal {
+.tap-area {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+}
+
+#tapCircle {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #4fd1ff, #008cff);
+  box-shadow: 0 0 60px #4fd1ff;
+}
+
+.window {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
+  background: rgba(0,0,0,0.8);
 }
 
-.modal-box {
+.window-content {
   background: #111;
+  margin: 80px auto;
   padding: 20px;
-  border-radius: 12px;
   width: 80%;
-  position: relative;
+  border-radius: 20px;
 }
 
 .close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 20px;
+  float: right;
   cursor: pointer;
-  }
+}
