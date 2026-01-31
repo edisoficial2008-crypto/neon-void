@@ -67,3 +67,16 @@ setInterval(() => {
 }, 1000);
 
 updateUI();
+// ===== ПРОКАЧКА =====
+let tapPower = parseInt(localStorage.getItem("tapPower")) || 1;
+let energyMax = parseInt(localStorage.getItem("energyMax")) || 4000;
+
+let upgradeTapPrice = parseInt(localStorage.getItem("upgradeTapPrice")) || 50;
+let upgradeEnergyPrice = parseInt(localStorage.getItem("upgradeEnergyPrice")) || 150;
+
+function saveUpgrades() {
+  localStorage.setItem("tapPower", tapPower);
+  localStorage.setItem("energyMax", energyMax);
+  localStorage.setItem("upgradeTapPrice", upgradeTapPrice);
+  localStorage.setItem("upgradeEnergyPrice", upgradeEnergyPrice);
+}
