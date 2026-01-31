@@ -3,65 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON VOID</title>
+<title>NEON VOID – Energy Game</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;user-select:none}
 body{
-font-family:Arial,Helvetica,sans-serif;
-background:radial-gradient(circle at top,#0a1025,#000);
-color:#fff;
-text-align:center;
-overflow:hidden
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:radial-gradient(circle at center,#0a1a2f,#000);
+  color:#fff;
+  text-align:center;
 }
-h1{margin:12px 0;letter-spacing:3px}
-.stats{font-size:15px;margin-bottom:6px}
-.buttons{display:flex;justify-content:center;gap:10px;margin:10px}
-.btn{
-padding:10px 16px;
-border-radius:16px;
-border:none;
-background:#1b2c5a;
-color:#fff;
-cursor:pointer
+h1{letter-spacing:4px;margin-top:20px}
+.top{margin:10px;font-size:18px}
+.btns button{
+  margin:5px;
+  padding:10px 18px;
+  border-radius:20px;
+  border:none;
+  cursor:pointer;
 }
-#tap{
-width:240px;
-height:240px;
-margin:50px auto;
-border-radius:50%;
-background:radial-gradient(circle at top,#5cf,#158bff);
-box-shadow:0 0 40px #2af,0 0 120px rgba(0,150,255,.7)
+#orb{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  margin:40px auto;
+  background:radial-gradient(circle,#4fc3ff,#0288d1);
+  box-shadow:0 0 40px #4fc3ff;
 }
-#tap:active{transform:scale(.94)}
-
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.85);
-display:none;
-justify-content:center;
-align-items:center
+.hidden{display:none}
+.panel{
+  max-width:300px;
+  margin:20px auto;
+  background:#111;
+  padding:15px;
+  border-radius:15px;
 }
-.box{
-width:90%;
-max-width:420px;
-background:#0b1433;
-border-radius:20px;
-padding:20px;
-max-height:80vh;
-overflow:auto;
-text-align:left
-}
-.close{float:right;font-size:20px;cursor:pointer}
 .item{
-background:#141f46;
-padding:10px;
-margin:8px 0;
-border-radius:12px
+  background:#222;
+  margin:8px 0;
+  padding:10px;
+  border-radius:10px;
 }
-.you{background:#1f3cff}
-hr{border:0;height:1px;background:#223;margin:10px 0}
 </style>
 </head>
 
@@ -69,185 +51,156 @@ hr{border:0;height:1px;background:#223;margin:10px 0}
 
 <h1>NEON VOID</h1>
 
-<div class="stats">
-💰 <span id="coins">0</span> |
-⚡ <span id="energy">0</span>/<span id="energyMax">4000</span>
+<div class="top">
+💰 <span id="coins">0</span>
+&nbsp;&nbsp;⚡ <span id="energy">0</span>/<span id="maxEnergy">100</span>
 </div>
 
-<div class="buttons">
-<button class="btn" onclick="openModal('shop')">🛒 Магазин</button>
-<button class="btn" onclick="openModal('profile')">👤 Профиль</button>
-<button class="btn" onclick="openModal('leaderboard')">🏆 Топ</button>
+<div class="btns">
+<button onclick="show('shop')">🛒 Магазин</button>
+<button onclick="show('profile')">👤 Профиль</button>
+<button onclick="show('leader')">🏆 Лидерборд</button>
 </div>
 
-<div id="tap" onclick="tap()"></div>
+<div id="orb" onclick="tap()"></div>
 
-<!-- SHOP -->
-<div class="modal" id="shop">
-<div class="box">
-<span class="close" onclick="closeModal('shop')">✕</span>
+<div id="shop" class="panel hidden">
 <h3>Магазин</h3>
-<div class="item" onclick="buyTap()">⚡ Сила тапа +1 — <span id="tapPrice"></span></div>
-<div class="item" onclick="buyEnergy()">🔋 Макс энергия +500 — <span id="energyPrice"></span></div>
-<hr>
-<div class="item" onclick="buyAuto()">🤖 Автотап +1/сек — <span id="autoPrice"></span></div>
-<div class="item" onclick="buyBonus()">💎 Бонус +10% — <span id="bonusPrice"></span></div>
-<hr>
-<div class="item" onclick="buyCore()">🧬 VOID CORE x1.1 — <span id="corePrice"></span></div>
-<div class="item" onclick="buyReactor()">☢ REACTOR +1 реген — <span id="reactorPrice"></span></div>
-<hr>
-<div class="item" onclick="buyMatrix()">🛰 MATRIX +5% — <span id="matrixPrice"></span></div>
-<div class="item" onclick="buyOverdrive()">🔥 OVERDRIVE x2 авто — <span id="overdrivePrice"></span></div>
-<hr>
-<div class="item" onclick="buyAscension()">🌌 ASCENSION — <span id="ascPrice"></span></div>
+<div class="item">
++1 к тапу — 500 💰
+<button onclick="buyTap()">Купить</button>
+</div>
+<div class="item">
++50 энергии — 1000 💰
+<button onclick="buyEnergy()">Купить</button>
 </div>
 </div>
 
-<!-- PROFILE -->
-<div class="modal" id="profile">
-<div class="box">
-<span class="close" onclick="closeModal('profile')">✕</span>
+<div id="profile" class="panel hidden">
 <h3>Профиль</h3>
-<p>Монеты: <span id="pCoins"></span></p>
-<p>Тапов: <span id="pTaps"></span></p>
-<p>Сила тапа: <span id="pTap"></span></p>
-<p>Автотап: <span id="pAuto"></span>/сек</p>
-<p>Бонус: <span id="pBonus"></span>%</p>
-<p>Ядро: x<span id="pCore"></span></p>
-<p>Реген: <span id="pRegen"></span>/сек</p>
-<p>Matrix: <span id="pMatrix"></span></p>
-<p>Ascension: <span id="pAsc"></span></p>
-</div>
+Имя: <b id="pname"></b><br>
+Тап/клик: <b id="tapPower"></b>
 </div>
 
-<!-- LEADERBOARD -->
-<div class="modal" id="leaderboard">
-<div class="box">
-<span class="close" onclick="closeModal('leaderboard')">✕</span>
-<h3>🏆 Лидерборд</h3>
-<div id="lb"></div>
-</div>
+<div id="leader" class="panel hidden">
+<h3>Лидерборд</h3>
+<div id="leaderList">Загрузка…</div>
 </div>
 
 <script>
-/* ===== SAFE LOAD ===== */
-function L(k,d){const v=parseFloat(localStorage.getItem(k));return isNaN(v)?d:v}
-function S(k,v){localStorage.setItem(k,String(v))}
+/* === SERVER === */
+const SERVER = "https://neon-void-l.onrender.com";
 
-let coins=L("coins",0),energyMax=L("energyMax",4000),energy=L("energy",energyMax)
-let tapPower=L("tapPower",1),taps=L("taps",0),auto=L("auto",0)
-let bonus=L("bonus",0),core=L("core",1),regen=L("regen",1)
-let matrix=L("matrix",0),overdrive=L("overdrive",0),asc=L("asc",0)
+/* === LOAD SAVE === */
+let save = JSON.parse(localStorage.getItem("neonSave")) || {
+  coins:0,
+  energy:100,
+  maxEnergy:100,
+  tapPower:1,
+  name:null
+};
 
-let tapPrice=L("tapPrice",200),energyPrice=L("energyPrice",800)
-let autoPrice=L("autoPrice",8000),bonusPrice=L("bonusPrice",20000)
-let corePrice=L("corePrice",250000),reactorPrice=L("reactorPrice",500000)
-let matrixPrice=L("matrixPrice",1000000),overdrivePrice=L("overdrivePrice",2000000)
-let ascPrice=5000000
-
-function save(){
-["coins","energy","energyMax","tapPower","taps","auto","bonus","core","regen",
-"matrix","overdrive","asc","tapPrice","energyPrice","autoPrice","bonusPrice",
-"corePrice","reactorPrice","matrixPrice","overdrivePrice"].forEach(k=>S(k,eval(k)))
+if(!save.name){
+  save.name = "Player" + Math.floor(Math.random()*9999);
 }
 
-function update(){
-energy=Math.min(energy,energyMax)
-coinsEl.textContent=coins
-energyEl.textContent=energy
-energyMaxEl.textContent=energyMax
+let {coins,energy,maxEnergy,tapPower,name} = save;
 
-tapPriceEl.textContent=tapPrice
-energyPriceEl.textContent=energyPrice
-autoPriceEl.textContent=autoPrice
-bonusPriceEl.textContent=bonusPrice
-corePriceEl.textContent=corePrice
-reactorPriceEl.textContent=reactorPrice
-matrixPriceEl.textContent=matrixPrice
-overdrivePriceEl.textContent=overdrivePrice
-ascPriceEl.textContent=ascPrice
+/* === UI === */
+const coinsEl = document.getElementById("coins");
+const energyEl = document.getElementById("energy");
+const maxEnergyEl = document.getElementById("maxEnergy");
+const pname = document.getElementById("pname");
+const tapPowerEl = document.getElementById("tapPower");
+const leaderList = document.getElementById("leaderList");
 
-pCoins.textContent=coins
-pTaps.textContent=taps
-pTap.textContent=tapPower
-pAuto.textContent=auto
-pBonus.textContent=bonus
-pCore.textContent=core.toFixed(2)
-pRegen.textContent=regen
-pMatrix.textContent=matrix?"ДА":"НЕТ"
-pAsc.textContent=asc?"ДА":"НЕТ"
+function updateUI(){
+  coinsEl.textContent = coins;
+  energyEl.textContent = energy;
+  maxEnergyEl.textContent = maxEnergy;
+  pname.textContent = name;
+  tapPowerEl.textContent = tapPower;
+}
+updateUI();
 
-updateLeaderboard()
+/* === SAVE === */
+function saveGame(){
+  localStorage.setItem("neonSave",JSON.stringify({
+    coins,energy,maxEnergy,tapPower,name
+  }));
 }
 
+/* === TAP === */
 function tap(){
-if(energy<=0)return
-let gain=tapPower*(1+bonus/100)*core
-if(matrix)gain*=1.05
-coins+=Math.floor(gain)
-energy--
-taps++
-save();update()
+  if(energy<=0) return;
+  coins += tapPower;
+  energy -= 1;
+  updateUI();
+  saveGame();
+  sendScore();
 }
 
-function buyTap(){if(coins<tapPrice)return;coins-=tapPrice;tapPower++;tapPrice*=1.6|0;save();update()}
-function buyEnergy(){if(coins<energyPrice)return;coins-=energyPrice;energyMax+=500;energy=energyMax;energyPrice*=1.7|0;save();update()}
-function buyAuto(){if(coins<autoPrice)return;coins-=autoPrice;auto++;autoPrice*=2|0;save();update()}
-function buyBonus(){if(coins<bonusPrice)return;coins-=bonusPrice;bonus+=10;bonusPrice*=2.3|0;save();update()}
-function buyCore(){if(coins<corePrice)return;coins-=corePrice;core*=1.1;corePrice*=3|0;save();update()}
-function buyReactor(){if(coins<reactorPrice)return;coins-=reactorPrice;regen++;reactorPrice*=3.5|0;save();update()}
-function buyMatrix(){if(matrix||coins<matrixPrice)return;coins-=matrixPrice;matrix=1;save();update()}
-function buyOverdrive(){if(overdrive||coins<overdrivePrice)return;coins-=overdrivePrice;overdrive=1;auto*=2;save();update()}
-function buyAscension(){if(asc||coins<ascPrice)return;asc=1;core*=2;auto+=10;save();update()}
+/* === ENERGY REGEN === */
+setInterval(()=>{
+  if(energy<maxEnergy){
+    energy++;
+    updateUI();
+    saveGame();
+  }
+},3000);
 
-setInterval(()=>{coins+=auto*core;energy=Math.min(energyMax,energy+regen);update()},1000)
-
-/* ===== LEADERBOARD ===== */
-function updateLeaderboard(){
-let list=JSON.parse(localStorage.getItem("lb")||"[]")
-list=list.filter(x=>x.id!=="you")
-list.push({id:"you",score:coins})
-list.sort((a,b)=>b.score-a.score)
-list=list.slice(0,10)
-localStorage.setItem("lb",JSON.stringify(list))
-
-lb.innerHTML=""
-list.forEach((p,i)=>{
-let d=document.createElement("div")
-d.className="item"+(p.id==="you"?" you":"")
-d.textContent=`${i+1}. ${p.id==="you"?"YOU":"Player"} — ${p.score}`
-lb.appendChild(d)
-})
+/* === SHOP === */
+function buyTap(){
+  if(coins>=500){
+    coins-=500;
+    tapPower++;
+    updateUI();
+    saveGame();
+  }
+}
+function buyEnergy(){
+  if(coins>=1000){
+    coins-=1000;
+    maxEnergy+=50;
+    energy=maxEnergy;
+    updateUI();
+    saveGame();
+  }
 }
 
-function openModal(id){document.getElementById(id).style.display="flex"}
-function closeModal(id){document.getElementById(id).style.display="none"}
+/* === PANELS === */
+function show(id){
+  ["shop","profile","leader"].forEach(x=>{
+    document.getElementById(x).classList.add("hidden");
+  });
+  document.getElementById(id).classList.remove("hidden");
+  if(id==="leader") loadLeaderboard();
+}
 
-const coinsEl=document.getElementById("coins")
-const energyEl=document.getElementById("energy")
-const energyMaxEl=document.getElementById("energyMax")
-const tapPriceEl=document.getElementById("tapPrice")
-const energyPriceEl=document.getElementById("energyPrice")
-const autoPriceEl=document.getElementById("autoPrice")
-const bonusPriceEl=document.getElementById("bonusPrice")
-const corePriceEl=document.getElementById("corePrice")
-const reactorPriceEl=document.getElementById("reactorPrice")
-const matrixPriceEl=document.getElementById("matrixPrice")
-const overdrivePriceEl=document.getElementById("overdrivePrice")
-const ascPriceEl=document.getElementById("ascPrice")
+/* === LEADERBOARD === */
+function sendScore(){
+  fetch(SERVER+"/submit",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name:name,score:coins})
+  }).catch(()=>{});
+}
 
-const pCoins=document.getElementById("pCoins")
-const pTaps=document.getElementById("pTaps")
-const pTap=document.getElementById("pTap")
-const pAuto=document.getElementById("pAuto")
-const pBonus=document.getElementById("pBonus")
-const pCore=document.getElementById("pCore")
-const pRegen=document.getElementById("pRegen")
-const pMatrix=document.getElementById("pMatrix")
-const pAsc=document.getElementById("pAsc")
-const lb=document.getElementById("lb")
-
-update()
+async function loadLeaderboard(){
+  try{
+    const r = await fetch(SERVER+"/top");
+    const d = await r.json();
+    leaderList.innerHTML="";
+    d.forEach((p,i)=>{
+      const div=document.createElement("div");
+      div.className="item";
+      div.textContent=`${i+1}. ${p.name} — ${p.score}`;
+      leaderList.appendChild(div);
+    });
+  }catch{
+    leaderList.innerHTML="Сервер недоступен";
+  }
+}
 </script>
 
 </body>
