@@ -95,7 +95,7 @@ body {
 <div class="header">⚡ NEON VOID ⚡</div>
 
 <div class="card">
-Очки: <span id="points">0</span>  
+Очки: <span id="points">0</span>
 </div>
 
 <div class="card">
@@ -121,11 +121,11 @@ body {
 
 <div id="shop" class="screen">
 <h3>🛒 Магазин</h3>
-<div class="card">💎 Буст х2 — 5000 очков</div>
-<div class="card">⚡ +100 энергии — 8000 очков</div>
-<div class="card">🚀 Автотап — 20000 очков</div>
-<div class="card">🌌 Премиум — 100000 очков</div>
-<div class="card">🛡 Легендарный буст — 500000 очков</div>
+<div class="card">💎 Буст х2 — 50,000 очков</div>
+<div class="card">⚡ +200 энергии — 80,000 очков</div>
+<div class="card">🚀 Автотап — 250,000 очков</div>
+<div class="card">🌌 Премиум — 1,000,000 очков</div>
+<div class="card">🛡 Легендарный буст — 5,000,000 очков</div>
 </div>
 
 <div id="profile" class="screen">
@@ -139,15 +139,16 @@ body {
 
 <div id="leaders" class="screen">
 <h3>🏆 Лидерборд</h3>
-<div class="card">🥇 Игрок1 — 150000</div>
-<div class="card">🥈 Игрок2 — 98000</div>
-<div class="card">🥉 Игрок3 — 72000</div>
+<div id="leaderList"></div>
+<button onclick="loadLeaders()">🔄 Обновить лидеров</button>
 </div>
 
 </div>
 
 <script>
 Telegram.WebApp.ready();
+
+const SERVER = "https://neon-void-4.onrender.com";
 
 let points = 0;
 let energy = 4000;
@@ -174,13 +175,40 @@ function updateUI(){
  (energy / maxEnergy * 100) + "%";
 }
 
-// ОФЛАЙН ВОССТАНОВЛЕНИЕ ЭНЕРГИИ
+// офлайн/онлайн восстановление (30 минут до фула)
 setInterval(()=>{
  if(energy < maxEnergy){
   energy += 1;
   updateUI();
  }
-}, 45000); // 30 минут до фула
+}, 45000);
+
+// сохраняем прогресс каждые 5 секунд
+setInterval(()=>{
+ fetch(`${SERVER}/save/${Telegram.WebApp.initDataUnsafe.user.id}/${points}/${energy}`);
+}, 5000);
+
+// загружаем прогресс при входе
+fetch(`${SERVER}/get/${Telegram.WebApp.initDataUnsafe.user.id}`)
+.then(r=>r.json())
+.then(data=>{
+ points = data.points;
+ energy = data.energy;
+ updateUI();
+});
+
+// лидерборд
+function loadLeaders(){
+ fetch(`${SERVER}/leaders`)
+ .then(r=>r.json())
+ .then(data=>{
+   let html = "";
+   data.forEach(p=>{
+     html += `<div class="card">#${p.rank} | ID: ${p.user_id} — ${p.points} очков</div>`;
+   });
+   document.getElementById("leaderList").innerHTML = html;
+ });
+}
 
 function show(id){
  document.querySelectorAll(".screen").forEach(el=>el.classList.remove("active"));
