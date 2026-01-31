@@ -175,7 +175,7 @@ function updateUI(){
  (energy / maxEnergy * 100) + "%";
 }
 
-// офлайн/онлайн восстановление (30 минут до фула)
+// восстановление энергии (30 минут до фула)
 setInterval(()=>{
  if(energy < maxEnergy){
   energy += 1;
@@ -185,7 +185,10 @@ setInterval(()=>{
 
 // сохраняем прогресс каждые 5 секунд
 setInterval(()=>{
- fetch(`${SERVER}/save/${Telegram.WebApp.initDataUnsafe.user.id}/${points}/${energy}`);
+ const uid = Telegram.WebApp.initDataUnsafe.user.id;
+ const name = Telegram.WebApp.initDataUnsafe.user.first_name;
+
+ fetch(`${SERVER}/save/${uid}/${points}/${energy}/${encodeURIComponent(name)}`);
 }, 5000);
 
 // загружаем прогресс при входе
@@ -204,7 +207,11 @@ function loadLeaders(){
  .then(data=>{
    let html = "";
    data.forEach(p=>{
-     html += `<div class="card">#${p.rank} | ID: ${p.user_id} — ${p.points} очков</div>`;
+     html += `
+     <div class="card">
+       <b>#${p.rank}</b> — ${p.name}<br>
+       🏆 ${p.points} очков
+     </div>`;
    });
    document.getElementById("leaderList").innerHTML = html;
  });
