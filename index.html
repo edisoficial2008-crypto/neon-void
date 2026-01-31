@@ -24,13 +24,13 @@ body {
 }
 
 .header {
-    padding-top: 20px;
+    padding-top: 15px;
     font-size: 22px;
     font-weight: bold;
 }
 
-.energy {
-    margin-top: 10px;
+.stats {
+    margin: 8px 0;
 }
 
 .circle-container {
@@ -49,7 +49,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -72,13 +72,24 @@ body {
 
 .screen {
     display: none;
-    padding: 20px;
+    padding: 15px;
 }
 
-.settings select {
-    width: 100%;
+.shop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.item {
+    background: rgba(255,255,255,0.08);
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 12px;
+}
+
+.buy {
+    margin-top: 6px;
+    background: #00ccff;
 }
 </style>
 </head>
@@ -87,46 +98,94 @@ body {
 
 <div class="app">
 
-<div class="header">
-💜 NEON VOID
-</div>
+<div class="header">💜 NEON VOID</div>
 
-<div class="energy" id="energyText">⚡ Энергия: 4000/4000</div>
+<div class="stats">
+<div id="energyText">⚡ Энергия: 4000/4000</div>
+<div id="scoreText">⭐ Очки: 0</div>
+<div id="tapText">👆 Сила тапа: 1</div>
+</div>
 
 <div class="circle-container">
 <div class="circle" id="tapBtn">ТАП</div>
 </div>
 
-<!-- Экраны -->
-<div id="shop" class="screen">🛒 Магазин (здесь будут покупки)</div>
-<div id="profile" class="screen">👤 Профиль игрока</div>
-<div id="leaderboard" class="screen">🏆 Лидерборд</div>
+<!-- МАГАЗИН -->
+<div id="shop" class="screen">
+<h3>🛒 Магазин (долгоигровая прокачка)</h3>
 
-<div id="settings" class="screen settings">
+<div class="shop-grid">
+
+<div class="item">
+<b>🔋 +200 макс. энергии</b>
+<div id="eLevel">Уровень: 0</div>
+<button class="btn buy" onclick="buyEnergy()">Купить (100)</button>
+</div>
+
+<div class="item">
+<b>⚡ Быстрее реген</b>
+<div id="rLevel">Уровень: 0</div>
+<button class="btn buy" onclick="buyRegen()">Купить (150)</button>
+</div>
+
+<div class="item">
+<b>👆 +1 к тапу</b>
+<div id="tLevel">Уровень: 0</div>
+<button class="btn buy" onclick="buyTap()">Купить (200)</button>
+</div>
+
+<div class="item">
+<b>🤖 Авто-тап (каждые 5 сек)</b>
+<div id="aLevel">Уровень: 0</div>
+<button class="btn buy" onclick="buyAuto()">Купить (500)</button>
+</div>
+
+<div class="item">
+<b>🔋 Батарея (+1000 энергии)</b>
+<button class="btn buy" onclick="useBattery()">Купить (300)</button>
+</div>
+
+<div class="item">
+<b>⭐ Множитель x2 на 1 час</b>
+<button class="btn buy" onclick="buyBoost()">Купить (800)</button>
+</div>
+
+</div>
+
+<br>
+<button class="btn" onclick="closeAll()">Закрыть</button>
+</div>
+
+<!-- ПРОФИЛЬ -->
+<div id="profile" class="screen">
+<h3>👤 Профиль</h3>
+<div id="profileInfo"></div>
+<br>
+<button class="btn" onclick="closeAll()">Закрыть</button>
+</div>
+
+<!-- ЛИДЕРБОРД (UI — сервер можно подключить позже) -->
+<div id="leaderboard" class="screen">
+<h3>🏆 Лидерборд</h3>
+<div>🥇 Ты — пока локально №1 😎</div>
+<br>
+<button class="btn" onclick="closeAll()">Закрыть</button>
+</div>
+
+<!-- НАСТРОЙКИ -->
+<div id="settings" class="screen">
 <h3>⚙️ Настройки</h3>
-<select id="langSelect">
-<option value="ru">Русский</option>
-<option value="uk">Українська</option>
-<option value="en">English</option>
-<option value="es">Español</option>
-<option value="fr">Français</option>
-<option value="de">Deutsch</option>
-<option value="pt">Português</option>
-<option value="tr">Türkçe</option>
-<option value="ar">العربية</option>
-<option value="zh">中文</option>
-<option value="ja">日本語</option>
-</select>
+Язык пока русский (можно добавить позже)
 <br><br>
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
-<!-- Нижнее меню -->
+<!-- НИЖНЕЕ МЕНЮ -->
 <div class="menu">
-<button class="btn" onclick="openScreen('shop')" id="btnShop">Магазин</button>
-<button class="btn" onclick="openScreen('profile')" id="btnProfile">Профиль</button>
-<button class="btn" onclick="openScreen('leaderboard')" id="btnLb">Лидерборд</button>
-<button class="btn" onclick="openScreen('settings')" id="btnSet">Настройки</button>
+<button class="btn" onclick="openScreen('shop')">Магазин</button>
+<button class="btn" onclick="openScreen('profile')">Профиль</button>
+<button class="btn" onclick="openScreen('leaderboard')">Лидерборд</button>
+<button class="btn" onclick="openScreen('settings')">Настройки</button>
 </div>
 
 </div>
@@ -134,140 +193,129 @@ body {
 <script>
 Telegram.WebApp.ready();
 
-let maxEnergy = 4000;
-let energy = 4000;
-let lastRecover = Date.now();
+// ===== БАЗОВЫЕ ПАРАМЕТРЫ =====
+let maxEnergy = Number(localStorage.getItem("maxEnergy")) || 4000;
+let energy = Number(localStorage.getItem("energy")) || 4000;
+let score = Number(localStorage.getItem("score")) || 0;
+let tapPower = Number(localStorage.getItem("tapPower")) || 1;
+let regenBonus = Number(localStorage.getItem("regenBonus")) || 0;
+let autoLevel = Number(localStorage.getItem("autoLevel")) || 0;
 
-const texts = {
-ru: {
- shop:"Магазин",
- profile:"Профиль",
- lb:"Лидерборд",
- set:"Настройки",
- tap:"ТАП",
- energy:"⚡ Энергия:"
-},
-en: {
- shop:"Shop",
- profile:"Profile",
- lb:"Leaderboard",
- set:"Settings",
- tap:"TAP",
- energy:"⚡ Energy:"
-},
-uk: {
- shop:"Магазин",
- profile:"Профіль",
- lb:"Лідерборд",
- set:"Налаштування",
- tap:"ТАП",
- energy:"⚡ Енергія:"
-},
-es: {
- shop:"Tienda",
- profile:"Perfil",
- lb:"Clasificación",
- set:"Ajustes",
- tap:"TOCAR",
- energy:"⚡ Energía:"
-},
-fr: {
- shop:"Boutique",
- profile:"Profil",
- lb:"Classement",
- set:"Paramètres",
- tap:"TAPER",
- energy:"⚡ Énergie:"
-},
-de: {
- shop:"Shop",
- profile:"Profil",
- lb:"Rangliste",
- set:"Einstellungen",
- tap:"TIPPEN",
- energy:"⚡ Energie:"
-},
-pt: {
- shop:"Loja",
- profile:"Perfil",
- lb:"Ranking",
- set:"Configurações",
- tap:"TOCAR",
- energy:"⚡ Energia:"
-},
-tr: {
- shop:"Mağaza",
- profile:"Profil",
- lb:"Liderlik",
- set:"Ayarlar",
- tap:"DOKUN",
- energy:"⚡ Enerji:"
-},
-ar: {
- shop:"متجر",
- profile:"الملف",
- lb:"ترتيب",
- set:"إعدادات",
- tap:"اضغط",
- energy:"⚡ طاقة:"
-},
-zh: {
- shop:"商店",
- profile:"个人资料",
- lb:"排行榜",
- set:"设置",
- tap:"点击",
- energy:"⚡ 能量:"
-},
-ja: {
- shop:"ショップ",
- profile:"プロフィール",
- lb:"ランキング",
- set:"設定",
- tap:"タップ",
- energy:"⚡ エネルギー:"
-}
-};
+let eLevel = Number(localStorage.getItem("eLevel")) || 0;
+let rLevel = Number(localStorage.getItem("rLevel")) || 0;
+let tLevel = Number(localStorage.getItem("tLevel")) || 0;
 
-function applyLang(lang){
-localStorage.setItem("lang", lang);
+// ===== ОБНОВЛЕНИЕ UI =====
+function updateUI(){
+document.getElementById("energyText").innerText = `⚡ Энергия: ${energy}/${maxEnergy}`;
+document.getElementById("scoreText").innerText = `⭐ Очки: ${score}`;
+document.getElementById("tapText").innerText = `👆 Сила тапа: ${tapPower}`;
 
-document.getElementById("btnShop").innerText = texts[lang].shop;
-document.getElementById("btnProfile").innerText = texts[lang].profile;
-document.getElementById("btnLb").innerText = texts[lang].lb;
-document.getElementById("btnSet").innerText = texts[lang].set;
-document.getElementById("tapBtn").innerText = texts[lang].tap;
-updateEnergy();
+document.getElementById("eLevel").innerText = "Уровень: " + eLevel;
+document.getElementById("rLevel").innerText = "Уровень: " + rLevel;
+document.getElementById("tLevel").innerText = "Уровень: " + tLevel;
+document.getElementById("aLevel").innerText = "Уровень: " + autoLevel;
+
+document.getElementById("profileInfo").innerHTML = `
+Очки: ${score}<br>
+Макс энергия: ${maxEnergy}<br>
+Сила тапа: ${tapPower}<br>
+Реген бонус: ${regenBonus}<br>
+Автотап уровень: ${autoLevel}
+`;
 }
 
-document.getElementById("langSelect").onchange = (e)=>{
-applyLang(e.target.value);
-};
-
-function updateEnergy(){
-let lang = localStorage.getItem("lang") || "ru";
-document.getElementById("energyText").innerText =
-texts[lang].energy + " " + energy + "/" + maxEnergy;
-}
-
-setInterval(()=>{
-let now = Date.now();
-let diff = now - lastRecover;
-
-if(diff >= 30 * 60 * 1000 && energy < maxEnergy){
-energy = Math.min(maxEnergy, energy + 500);
-lastRecover = now;
-updateEnergy();
-}
-}, 10000);
-
+// ===== ТАП =====
 document.getElementById("tapBtn").onclick = ()=>{
-if(energy > 0){
-energy -= 1;
-updateEnergy();
+if(energy >= tapPower){
+energy -= tapPower;
+score += tapPower;
+save();
+updateUI();
 }
 };
 
+// ===== ВОССТАНОВЛЕНИЕ ЭНЕРГИИ (30 минут) =====
+setInterval(()=>{
+energy = Math.min(maxEnergy, energy + 100 + regenBonus);
+save();
+updateUI();
+}, 1800000); // 30 минут
+
+// ===== МАГАЗИН =====
+function buyEnergy(){
+if(score >= 100){
+score -= 100;
+eLevel++;
+maxEnergy += 200;
+save();
+updateUI();
+}
+}
+
+function buyRegen(){
+if(score >= 150){
+score -= 150;
+rLevel++;
+regenBonus += 50;
+save();
+updateUI();
+}
+}
+
+function buyTap(){
+if(score >= 200){
+score -= 200;
+tLevel++;
+tapPower += 1;
+save();
+updateUI();
+}
+}
+
+function buyAuto(){
+if(score >= 500){
+score -= 500;
+autoLevel++;
+save();
+updateUI();
+}
+}
+
+function useBattery(){
+if(score >= 300){
+score -= 300;
+energy = Math.min(maxEnergy, energy + 1000);
+save();
+updateUI();
+}
+}
+
+function buyBoost(){
+if(score >= 800){
+score -= 800;
+tapPower *= 2;
+setTimeout(()=>{
+tapPower /= 2;
+save();
+updateUI();
+}, 3600000);
+save();
+updateUI();
+}
+}
+
+// ===== АВТО-ТАП =====
+setInterval(()=>{
+if(autoLevel > 0){
+score += autoLevel;
+energy = Math.max(0, energy - autoLevel);
+save();
+updateUI();
+}
+}, 5000);
+
+// ===== СКРИНЫ =====
 function openScreen(id){
 document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
 document.getElementById(id).style.display="block";
@@ -277,7 +325,20 @@ function closeAll(){
 document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
 }
 
-applyLang(localStorage.getItem("lang") || "ru");
+// ===== СОХРАНЕНИЕ =====
+function save(){
+localStorage.setItem("energy", energy);
+localStorage.setItem("score", score);
+localStorage.setItem("tapPower", tapPower);
+localStorage.setItem("regenBonus", regenBonus);
+localStorage.setItem("autoLevel", autoLevel);
+localStorage.setItem("maxEnergy", maxEnergy);
+localStorage.setItem("eLevel", eLevel);
+localStorage.setItem("rLevel", rLevel);
+localStorage.setItem("tLevel", tLevel);
+}
+
+updateUI();
 </script>
 
 </body>
