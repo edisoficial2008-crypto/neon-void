@@ -1,7 +1,8 @@
+import os
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-TOKEN = "8485189326:AAE1VrVkjmyzJQvUGLuMx0I8OPa72fIBg6A"
+TOKEN = os.getenv("BOT_TOKEN", "8485189326:AAE1VrVkjmyzJQvUGLuMx0I8OPa72fIBg6A")
 bot = telebot.TeleBot(TOKEN)
 
 WEBAPP_URL = "https://neon-void-4.onrender.com/index.html"
