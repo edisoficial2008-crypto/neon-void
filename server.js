@@ -5,18 +5,18 @@ const cors = require("cors");
 const app = express();
 const PORT = 10000;
 
-// ТВОЙ РЕНДЕР
-const BASE_URL = "https://neon-void-2.onrender.com";
-
 app.use(cors());
 app.use(express.json());
 
-// ======== БАЗА (НЕ СТИРАЕТ ВАШ ПРОГРЕСС) ========
 const DB_FILE = "db.json";
 
+// ===== БАЗА ДАННЫХ =====
 function loadDB() {
   if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify({ players: {} }, null, 2));
+    fs.writeFileSync(
+      DB_FILE,
+      JSON.stringify({ players: {} }, null, 2)
+    );
   }
   return JSON.parse(fs.readFileSync(DB_FILE));
 }
@@ -25,10 +25,9 @@ function saveDB(db) {
   fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
-// ====== СОХРАНЕНИЕ ОЧКОВ ======
+// ====== СОХРАНЕНИЕ + ОФЛАЙН РЕГЕН ======
 app.post("/submit", (req, res) => {
   const { userId, username, score, energy } = req.body;
-
   let db = loadDB();
 
   if (!db.players[userId]) {
@@ -36,24 +35,75 @@ app.post("/submit", (req, res) => {
       username,
       score: 0,
       energy: 100,
-      lastActive: Date.now()
+      maxEnergy: 100,
+      lastActive: Date.now(),
+      boosts: [],
+      coins: 0
     };
   }
 
-  db.players[userId].username = username;
-  db.players[userId].score = Math.max(
-    db.players[userId].score,
-    score
-  );
-  db.players[userId].energy = energy;
-  db.players[userId].lastActive = Date.now();
+  const p = db.players[userId];
+
+  // Офлайн реген (1 энергия каждые 30 секунд)
+  const now = Date.now();
+  const diff = Math.floor((now - p.lastActive) / 30000);
+  p.energy = Math.min(p.maxEnergy, p.energy + diff);
+
+  p.username = username;
+  p.score = Math.max(p.score, score);
+  p.energy = energy;
+  p.lastActive = now;
 
   saveDB(db);
-
   res.json({ status: "ok" });
 });
 
-// ====== ЛИДЕРБОРД (ТОП-20) ======
+// ====== ПОКУПКА БУСТА ======
+app.post("/buy", (req, res) => {
+  const { userId, item, price, maxEnergyBonus } = req.body;
+  let db = loadDB();
+
+  if (!db.players[userId]) {
+    return res.status(400).json({ error: "Нет игрока" });
+  }
+
+  const p = db.players[userId];
+
+  if (p.score < price) {
+    return res.json({ ok: false, msg: "Недостаточно монет" });
+  }
+
+  p.score -= price;
+  p.maxEnergy += maxEnergyBonus;
+  p.boosts.push(item);
+
+  saveDB(db);
+  res.json({ ok: true, newMax: p.maxEnergy, newScore: p.score });
+});
+
+// ====== ПРОФИЛЬ ======
+app.get("/profile/:id", (req, res) => {
+  let db = loadDB();
+  const p = db.players[req.params.id];
+
+  if (!p) {
+    return res.json({ error: "Нет профиля" });
+  }
+
+  const all = Object.values(db.players).sort((a,b)=>b.score-a.score);
+  const rank = all.findIndex(x => x.username === p.username) + 1;
+
+  res.json({
+    username: p.username,
+    score: p.score,
+    energy: p.energy,
+    maxEnergy: p.maxEnergy,
+    boosts: p.boosts,
+    rank
+  });
+});
+
+// ====== ЛИДЕРБОРД ======
 app.get("/top", (req, res) => {
   let db = loadDB();
 
@@ -69,33 +119,8 @@ app.get("/top", (req, res) => {
   res.json(top);
 });
 
-// ====== ПРОФИЛЬ ======
-app.get("/profile/:id", (req, res) => {
-  let db = loadDB();
-  const p = db.players[req.params.id];
-
-  if (!p) {
-    return res.json({
-      username: "Новичок",
-      score: 0,
-      energy: 100,
-      rank: "Bronze"
-    });
-  }
-
-  const all = Object.values(db.players).sort((a,b)=>b.score-a.score);
-  const rank = all.findIndex(x => x.username === p.username) + 1;
-
-  res.json({
-    username: p.username,
-    score: p.score,
-    energy: p.energy,
-    rank
-  });
-});
-
 app.get("/", (req, res) => {
-  res.send("NEON VOID SERVER IS LIVE 🚀");
+  res.send("NEON VOID SERVER LIVE 🚀");
 });
 
 app.listen(PORT, () => {
