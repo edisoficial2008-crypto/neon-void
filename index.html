@@ -1,218 +1,56 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON VOID</title>
-
-<style>
-* { box-sizing: border-box; font-family: system-ui, sans-serif; }
-
-body {
-  margin: 0;
-  background: radial-gradient(circle at center, #0b1b3a, #020512);
-  color: #fff;
-  overflow: hidden;
-}
-
-.header {
-  text-align: center;
-  padding: 14px;
-  background: rgba(0,0,0,.5);
-}
-
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  font-size: 18px;
-}
-
-.nav {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 10px;
-}
-
-.nav button {
-  border: none;
-  border-radius: 14px;
-  padding: 10px 18px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.tap-zone {
-  position: relative;
-  height: calc(100vh - 200px);
-}
-
-.tap-circle {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #5ff6ff, #007bff);
-  box-shadow: 0 0 40px #4cf, 0 0 120px #06f;
-  cursor: pointer;
-  user-select: none;
-}
-
-.tap-circle:active { transform: translate(-50%, -50%) scale(0.95); }
-
-.float {
-  position: absolute;
-  color: #8ff;
-  font-size: 22px;
-  font-weight: 600;
-  animation: float 1s ease-out forwards;
-  pointer-events: none;
-}
-
-@keyframes float {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-60px); }
-}
-
-/* MODALS */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.9);
-  display: none;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.modal-content {
-  max-width: 500px;
-  margin: auto;
-}
-
-.close {
-  font-size: 28px;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>NEON VOID — Energy Game</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="header">
-  <h2>NEON VOID</h2>
+<div class="top">
+  <h1>NEON VOID</h1>
   <div class="stats">
-    <div>💰 <span id="coins">0</span></div>
-    <div>⚡ <span id="energy">0</span>/<span id="maxEnergy">0</span></div>
+    💰 <span id="coins">0</span>
+    ⚡ <span id="energy">0</span>/<span id="maxEnergy">4000</span>
   </div>
 </div>
 
-<div class="nav">
-  <button onclick="openModal('shop')">🛒 Магазин</button>
-  <button onclick="openModal('profile')">👤 Профиль</button>
-  <button onclick="openModal('leader')">🏆 Лидерборд</button>
+<div class="buttons">
+  <button onclick="openWindow('shop')">🛒 Магазин</button>
+  <button onclick="openWindow('profile')">👤 Профиль</button>
+  <button onclick="openWindow('leaderboard')">🏆 Лидерборд</button>
 </div>
 
-<div class="tap-zone">
-  <div class="tap-circle" onclick="tap(event)"></div>
+<div class="tap-area">
+  <div id="tapCircle"></div>
 </div>
 
-<!-- SHOP -->
-<div class="modal" id="shop">
-  <div class="modal-content">
-    <div class="close" onclick="closeModal()">✕</div>
+<!-- ОКНА -->
+<div class="window" id="shop">
+  <div class="window-content">
+    <span class="close" onclick="closeWindow()">✖</span>
     <h2>Магазин</h2>
-    <button onclick="buyTap()">+1 к тапу (1000)</button>
+    <button onclick="buyUpgrade()">+1 к тапу (1000💰)</button>
   </div>
 </div>
 
-<!-- PROFILE -->
-<div class="modal" id="profile">
-  <div class="modal-content">
-    <div class="close" onclick="closeModal()">✕</div>
-    <p>Очки: <span id="pCoins"></span></p>
-    <p>Сила тапа: <span id="pTap"></span></p>
+<div class="window" id="profile">
+  <div class="window-content">
+    <span class="close" onclick="closeWindow()">✖</span>
+    <h2>Профиль</h2>
+    <p>Тапов: <span id="taps">0</span></p>
+    <p>Сила тапа: <span id="tapPower">1</span></p>
   </div>
 </div>
 
-<!-- LEADER -->
-<div class="modal" id="leader">
-  <div class="modal-content">
-    <div class="close" onclick="closeModal()">✕</div>
-    <p>Скоро онлайн</p>
+<div class="window" id="leaderboard">
+  <div class="window-content">
+    <span class="close" onclick="closeWindow()">✖</span>
+    <h2>Лидерборд</h2>
+    <p>Скоро...</p>
   </div>
 </div>
 
-<script>
-/* SAFE LOAD */
-const saved = JSON.parse(localStorage.getItem("neon_void")) || {};
-
-let coins = Number(saved.coins) || 0;
-let energy = Number(saved.energy) || 4000;
-let maxEnergy = Number(saved.maxEnergy) || 4000;
-let tapPower = Number(saved.tapPower) || 1;
-
-function save() {
-  localStorage.setItem("neon_void", JSON.stringify({
-    coins, energy, maxEnergy, tapPower
-  }));
-}
-
-function tap(e) {
-  if (energy <= 0) return;
-  coins += tapPower;
-  energy -= 1;
-  spawnFloat(e);
-  update();
-  save();
-}
-
-function spawnFloat(e) {
-  const f = document.createElement("div");
-  f.className = "float";
-  f.textContent = "+" + tapPower;
-  f.style.left = e.clientX + "px";
-  f.style.top = e.clientY + "px";
-  document.body.appendChild(f);
-  setTimeout(() => f.remove(), 1000);
-}
-
-function update() {
-  coinsEl.textContent = coins;
-  energyEl.textContent = energy;
-  maxEnergyEl.textContent = maxEnergy;
-  pCoins.textContent = coins;
-  pTap.textContent = tapPower;
-}
-
-function buyTap() {
-  if (coins >= 1000) {
-    coins -= 1000;
-    tapPower++;
-    update();
-    save();
-  }
-}
-
-function openModal(id) {
-  document.getElementById(id).style.display = "block";
-}
-function closeModal() {
-  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
-}
-
-const coinsEl = document.getElementById("coins");
-const energyEl = document.getElementById("energy");
-const maxEnergyEl = document.getElementById("maxEnergy");
-const pCoins = document.getElementById("pCoins");
-const pTap = document.getElementById("pTap");
-
-update();
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
