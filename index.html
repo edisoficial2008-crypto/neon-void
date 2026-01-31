@@ -6,71 +6,82 @@
 <title>NEON VOID</title>
 
 <style>
-* { box-sizing:border-box; user-select:none }
-body {
-  margin:0;
-  background: radial-gradient(circle at top, #050b1a, #000);
-  font-family: Arial, sans-serif;
-  color:#fff;
-  text-align:center;
+*{box-sizing:border-box;user-select:none}
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:radial-gradient(circle at top,#060b1c,#000);
+color:#fff;
+text-align:center;
 }
-h1 { margin:15px 0; letter-spacing:2px }
-.stats { font-size:17px }
-.buttons { display:flex; justify-content:center; gap:10px; margin:10px }
-.btn {
-  padding:10px 16px;
-  border-radius:20px;
-  border:none;
-  cursor:pointer;
+h1{margin:12px 0;letter-spacing:2px}
+.stats{font-size:16px}
+.buttons{display:flex;justify-content:center;gap:10px;margin:10px}
+.btn{
+padding:10px 16px;
+border-radius:18px;
+border:none;
+cursor:pointer;
+background:#1c2b55;
+color:#fff;
 }
-#tap {
-  width:240px;height:240px;
-  margin:60px auto;
-  border-radius:50%;
-  background: radial-gradient(circle at top,#5ee7ff,#1e90ff);
-  box-shadow:0 0 40px #3fdcff,0 0 120px rgba(0,180,255,.8);
+#tap{
+width:240px;height:240px;
+margin:60px auto;
+border-radius:50%;
+background:radial-gradient(circle at top,#6cf,#29f);
+box-shadow:0 0 40px #4cf,0 0 120px rgba(0,150,255,.7);
 }
-#tap:active{transform:scale(.94)}
+#tap:active{transform:scale(.95)}
 
-.modal {
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.8);
-  display:none; justify-content:center; align-items:center;
+.modal{
+position:fixed;inset:0;
+background:rgba(0,0,0,.85);
+display:none;
+justify-content:center;
+align-items:center;
 }
-.box {
-  width:90%; max-width:420px;
-  background:#0b1224;
-  padding:20px; border-radius:20px;
-  max-height:80vh; overflow:auto;
+.box{
+width:90%;
+max-width:420px;
+background:#0b1224;
+border-radius:20px;
+padding:20px;
+max-height:80vh;
+overflow:auto;
 }
-.close { float:right; cursor:pointer }
-.item {
-  background:#121b38;
-  padding:12px; margin:10px 0;
-  border-radius:14px; cursor:pointer;
+.close{float:right;font-size:20px;cursor:pointer}
+.item{
+background:#121b38;
+padding:12px;
+margin:10px 0;
+border-radius:14px;
+cursor:pointer;
 }
+hr{border:0;height:1px;background:#223}
 </style>
 </head>
 
 <body>
 
 <h1>NEON VOID</h1>
+
 <div class="stats">
 💰 <span id="coins">0</span> |
 ⚡ <span id="energy">0</span>/<span id="energyMax">4000</span>
 </div>
 
 <div class="buttons">
-<button class="btn" onclick="open('shop')">🛒 Магазин</button>
-<button class="btn" onclick="open('profile')">👤 Профиль</button>
+<button class="btn" onclick="openModal('shop')">🛒 Магазин</button>
+<button class="btn" onclick="openModal('profile')">👤 Профиль</button>
 </div>
 
-<div id="tap" onclick="tap(event)"></div>
+<div id="tap" onclick="tap()"></div>
 
-<!-- МАГАЗИН -->
+<!-- SHOP -->
 <div class="modal" id="shop">
 <div class="box">
-<span class="close" onclick="close('shop')">✕</span>
+<span class="close" onclick="closeModal('shop')">✕</span>
 <h3>Магазин</h3>
 
 <div class="item" onclick="buyTap()">⚡ Сила тапа +1<br>Цена: <span id="tapPrice"></span></div>
@@ -79,88 +90,115 @@ h1 { margin:15px 0; letter-spacing:2px }
 <hr>
 
 <div class="item" onclick="buyAuto()">🤖 Автотап +1/сек<br>Цена: <span id="autoPrice"></span></div>
-<div class="item" onclick="buyBonus()">💎 Бонус к тапу +10%<br>Цена: <span id="bonusPrice"></span></div>
+<div class="item" onclick="buyBonus()">💎 Бонус +10%<br>Цена: <span id="bonusPrice"></span></div>
 
 <hr>
 
 <div class="item" onclick="buyMulti()">🚀 Множитель x2<br>Цена: <span id="multiPrice"></span></div>
 <div class="item" onclick="buyVIP()">👑 VIP CORE<br>Цена: <span id="vipPrice"></span></div>
-
 </div>
 </div>
 
-<!-- ПРОФИЛЬ -->
+<!-- PROFILE -->
 <div class="modal" id="profile">
 <div class="box">
-<span class="close" onclick="close('profile')">✕</span>
+<span class="close" onclick="closeModal('profile')">✕</span>
 <h3>Профиль</h3>
-<p>Тапов: <span id="taps"></span></p>
-<p>Сила тапа: <span id="tapPower"></span></p>
-<p>Автотап: <span id="auto"></span>/сек</p>
-<p>Бонус: <span id="bonus"></span>%</p>
-<p>Множитель: x<span id="multi"></span></p>
+<p>Монеты: <span id="pCoins"></span></p>
+<p>Тапов: <span id="pTaps"></span></p>
+<p>Сила тапа: <span id="pTap"></span></p>
+<p>Автотап: <span id="pAuto"></span>/сек</p>
+<p>Бонус: <span id="pBonus"></span>%</p>
+<p>Множитель: x<span id="pMulti"></span></p>
 </div>
 </div>
 
 <script>
-let S = k => parseInt(localStorage.getItem(k))||0;
-let coins=S("coins"), energyMax=S("energyMax")||4000, energy=S("energy")||energyMax;
-let tapPower=S("tapPower")||1, taps=S("taps");
-let auto=S("auto"), bonus=S("bonus"), multi=S("multi")||1, vip=S("vip");
+const get=k=>+localStorage.getItem(k)||0;
+const set=k=>localStorage.setItem(k,window[k]);
 
-let tapPrice=S("tapPrice")||100;
-let energyPrice=S("energyPrice")||400;
-let autoPrice=S("autoPrice")||5000;
-let bonusPrice=S("bonusPrice")||15000;
-let multiPrice=S("multiPrice")||100000;
+let coins=get("coins");
+let energyMax=get("energyMax")||4000;
+let energy=get("energy")||energyMax;
+let tapPower=get("tapPower")||1;
+let taps=get("taps");
+let auto=get("auto");
+let bonus=get("bonus");
+let multi=get("multi")||1;
+let vip=get("vip");
+
+let tapPrice=get("tapPrice")||100;
+let energyPrice=get("energyPrice")||400;
+let autoPrice=get("autoPrice")||5000;
+let bonusPrice=get("bonusPrice")||15000;
+let multiPrice=get("multiPrice")||100000;
 let vipPrice=1000000;
 
 function save(){
-Object.assign(localStorage,{
-coins,energy,energyMax,tapPower,taps,auto,bonus,multi,vip,
-tapPrice,energyPrice,autoPrice,bonusPrice,multiPrice
-})}
+["coins","energy","energyMax","tapPower","taps","auto","bonus","multi","vip",
+"tapPrice","energyPrice","autoPrice","bonusPrice","multiPrice"]
+.forEach(set);
+}
 
-function upd(){
-coins=Math.max(0,coins);
+function update(){
 energy=Math.min(energy,energyMax);
-["coins","energy","energyMax","tapPower","taps","auto","bonus","multi"]
-.forEach(id=>document.getElementById(id).textContent=eval(id));
-["tapPrice","energyPrice","autoPrice","bonusPrice","multiPrice","vipPrice"]
-.forEach(id=>document.getElementById(id).textContent=eval(id));
+coins=Math.max(0,coins);
+
+coinsEl.textContent=coins;
+energyEl.textContent=energy;
+energyMaxEl.textContent=energyMax;
+
+tapPriceEl.textContent=tapPrice;
+energyPriceEl.textContent=energyPrice;
+autoPriceEl.textContent=autoPrice;
+bonusPriceEl.textContent=bonusPrice;
+multiPriceEl.textContent=multiPrice;
+vipPriceEl.textContent=vipPrice;
+
+pCoins.textContent=coins;
+pTaps.textContent=taps;
+pTap.textContent=tapPower;
+pAuto.textContent=auto;
+pBonus.textContent=bonus;
+pMulti.textContent=multi;
 }
 
-function tap(e){
+function tap(){
 if(energy<=0)return;
-let gain=Math.floor(tapPower*(1+bonus/100)*multi);
-coins+=gain; energy--; taps++;
-save(); upd();
+const gain=Math.floor(tapPower*(1+bonus/100)*multi);
+coins+=gain;
+energy--;
+taps++;
+save();update();
 }
 
-function buyTap(){ if(coins<tapPrice)return;
-coins-=tapPrice; tapPower++; tapPrice=Math.floor(tapPrice*1.7); save();upd();}
-function buyEnergy(){ if(coins<energyPrice)return;
-coins-=energyPrice; energyMax+=500; energy=energyMax;
-energyPrice=Math.floor(energyPrice*1.8); save();upd();}
-function buyAuto(){ if(coins<autoPrice)return;
-coins-=autoPrice; auto++; autoPrice=Math.floor(autoPrice*2.2); save();upd();}
-function buyBonus(){ if(coins<bonusPrice)return;
-coins-=bonusPrice; bonus+=10; bonusPrice=Math.floor(bonusPrice*2.5); save();upd();}
-function buyMulti(){ if(multi>=2||coins<multiPrice)return;
-coins-=multiPrice; multi=2; save();upd();}
-function buyVIP(){ if(vip||coins<vipPrice)return;
-coins-=vipPrice; vip=1; multi=3; auto+=5; save();upd();}
+function buyTap(){if(coins<tapPrice)return;coins-=tapPrice;tapPower++;tapPrice=Math.floor(tapPrice*1.7);save();update();}
+function buyEnergy(){if(coins<energyPrice)return;coins-=energyPrice;energyMax+=500;energy=energyMax;energyPrice=Math.floor(energyPrice*1.8);save();update();}
+function buyAuto(){if(coins<autoPrice)return;coins-=autoPrice;auto++;autoPrice=Math.floor(autoPrice*2.2);save();update();}
+function buyBonus(){if(coins<bonusPrice)return;coins-=bonusPrice;bonus+=10;bonusPrice=Math.floor(bonusPrice*2.5);save();update();}
+function buyMulti(){if(multi>=2||coins<multiPrice)return;coins-=multiPrice;multi=2;save();update();}
+function buyVIP(){if(vip||coins<vipPrice)return;coins-=vipPrice;vip=1;multi=3;auto+=5;save();update();}
 
 setInterval(()=>{
-coins+=auto*Math.max(1,multi);
+coins+=auto*multi;
 if(energy<energyMax)energy++;
-save(); upd();
+save();update();
 },1000);
 
-function open(id){document.getElementById(id).style.display="flex"}
-function close(id){document.getElementById(id).style.display="none"}
+function openModal(id){document.getElementById(id).style.display="flex"}
+function closeModal(id){document.getElementById(id).style.display="none"}
 
-upd();
+const coinsEl=document.getElementById("coins");
+const energyEl=document.getElementById("energy");
+const energyMaxEl=document.getElementById("energyMax");
+const tapPriceEl=document.getElementById("tapPrice");
+const energyPriceEl=document.getElementById("energyPrice");
+const autoPriceEl=document.getElementById("autoPrice");
+const bonusPriceEl=document.getElementById("bonusPrice");
+const multiPriceEl=document.getElementById("multiPrice");
+const vipPriceEl=document.getElementById("vipPrice");
+
+update();
 </script>
 
 </body>
