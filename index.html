@@ -6,59 +6,81 @@
 <title>NEON VOID</title>
 
 <style>
-*{box-sizing:border-box;user-select:none}
+*{margin:0;padding:0;box-sizing:border-box;user-select:none}
 body{
-margin:0;
 font-family:Arial,Helvetica,sans-serif;
-background:radial-gradient(circle at top,#060b1c,#000);
+background:radial-gradient(circle at top,#0a1025,#000);
 color:#fff;
 text-align:center;
+overflow:hidden;
 }
-h1{margin:12px 0;letter-spacing:2px}
-.stats{font-size:16px}
-.buttons{display:flex;justify-content:center;gap:10px;margin:10px}
+
+h1{margin:12px 0;letter-spacing:3px}
+
+.stats{font-size:15px;margin-bottom:6px}
+
+.buttons{
+display:flex;
+justify-content:center;
+gap:10px;
+margin:10px;
+}
+
 .btn{
 padding:10px 16px;
-border-radius:18px;
+border-radius:16px;
 border:none;
-cursor:pointer;
-background:#1c2b55;
+background:#1b2c5a;
 color:#fff;
+cursor:pointer;
 }
+
 #tap{
-width:240px;height:240px;
-margin:60px auto;
+width:240px;
+height:240px;
+margin:50px auto;
 border-radius:50%;
-background:radial-gradient(circle at top,#6cf,#29f);
-box-shadow:0 0 40px #4cf,0 0 120px rgba(0,150,255,.7);
+background:radial-gradient(circle at top,#5cf,#158bff);
+box-shadow:0 0 40px #2af,0 0 120px rgba(0,150,255,.7);
 }
-#tap:active{transform:scale(.95)}
+
+#tap:active{transform:scale(.94)}
 
 .modal{
-position:fixed;inset:0;
+position:fixed;
+inset:0;
 background:rgba(0,0,0,.85);
 display:none;
 justify-content:center;
 align-items:center;
 }
+
 .box{
 width:90%;
 max-width:420px;
-background:#0b1224;
+background:#0b1433;
 border-radius:20px;
 padding:20px;
 max-height:80vh;
 overflow:auto;
+text-align:left;
 }
-.close{float:right;font-size:20px;cursor:pointer}
+
+.close{
+float:right;
+font-size:20px;
+cursor:pointer;
+}
+
 .item{
-background:#121b38;
+background:#141f46;
 padding:12px;
 margin:10px 0;
 border-radius:14px;
 cursor:pointer;
 }
-hr{border:0;height:1px;background:#223}
+
+hr{border:0;height:1px;background:#223;margin:10px 0}
 </style>
 </head>
 
@@ -94,8 +116,12 @@ hr{border:0;height:1px;background:#223}
 
 <hr>
 
-<div class="item" onclick="buyMulti()">🚀 Множитель x2<br>Цена: <span id="multiPrice"></span></div>
-<div class="item" onclick="buyVIP()">👑 VIP CORE<br>Цена: <span id="vipPrice"></span></div>
+<div class="item" onclick="buyCore()">🧬 VOID CORE (x1.1 навсегда)<br>Цена: <span id="corePrice"></span></div>
+<div class="item" onclick="buyReactor()">☢ REACTOR (+5% реген)<br>Цена: <span id="reactorPrice"></span></div>
+
+<hr>
+
+<div class="item" onclick="buyAscension()">🌌 ASCENSION (конец недели)<br>Цена: <span id="ascPrice"></span></div>
 </div>
 </div>
 
@@ -105,39 +131,43 @@ hr{border:0;height:1px;background:#223}
 <span class="close" onclick="closeModal('profile')">✕</span>
 <h3>Профиль</h3>
 <p>Монеты: <span id="pCoins"></span></p>
-<p>Тапов: <span id="pTaps"></span></p>
+<p>Тапов всего: <span id="pTaps"></span></p>
 <p>Сила тапа: <span id="pTap"></span></p>
 <p>Автотап: <span id="pAuto"></span>/сек</p>
 <p>Бонус: <span id="pBonus"></span>%</p>
-<p>Множитель: x<span id="pMulti"></span></p>
+<p>Постоянный множитель: x<span id="pCore"></span></p>
+<p>Реген энергии: <span id="pRegen"></span>/сек</p>
+<p>Ascension: <span id="pAsc"></span></p>
 </div>
 </div>
 
 <script>
-const get=k=>+localStorage.getItem(k)||0;
-const set=k=>localStorage.setItem(k,window[k]);
+const g=k=>+localStorage.getItem(k)||0;
+const s=k=>localStorage.setItem(k,window[k]);
 
-let coins=get("coins");
-let energyMax=get("energyMax")||4000;
-let energy=get("energy")||energyMax;
-let tapPower=get("tapPower")||1;
-let taps=get("taps");
-let auto=get("auto");
-let bonus=get("bonus");
-let multi=get("multi")||1;
-let vip=get("vip");
+let coins=g("coins");
+let energyMax=g("energyMax")||4000;
+let energy=g("energy")||energyMax;
+let tapPower=g("tapPower")||1;
+let taps=g("taps");
+let auto=g("auto");
+let bonus=g("bonus");
+let core=g("core")||1;
+let regen=g("regen")||1;
+let asc=g("asc");
 
-let tapPrice=get("tapPrice")||100;
-let energyPrice=get("energyPrice")||400;
-let autoPrice=get("autoPrice")||5000;
-let bonusPrice=get("bonusPrice")||15000;
-let multiPrice=get("multiPrice")||100000;
-let vipPrice=1000000;
+let tapPrice=g("tapPrice")||200;
+let energyPrice=g("energyPrice")||800;
+let autoPrice=g("autoPrice")||8000;
+let bonusPrice=g("bonusPrice")||20000;
+let corePrice=g("corePrice")||250000;
+let reactorPrice=g("reactorPrice")||500000;
+let ascPrice=1000000;
 
 function save(){
-["coins","energy","energyMax","tapPower","taps","auto","bonus","multi","vip",
-"tapPrice","energyPrice","autoPrice","bonusPrice","multiPrice"]
-.forEach(set);
+["coins","energy","energyMax","tapPower","taps","auto","bonus","core","regen","asc",
+"tapPrice","energyPrice","autoPrice","bonusPrice","corePrice","reactorPrice"]
+.forEach(s);
 }
 
 function update(){
@@ -152,42 +182,51 @@ tapPriceEl.textContent=tapPrice;
 energyPriceEl.textContent=energyPrice;
 autoPriceEl.textContent=autoPrice;
 bonusPriceEl.textContent=bonusPrice;
-multiPriceEl.textContent=multiPrice;
-vipPriceEl.textContent=vipPrice;
+corePriceEl.textContent=corePrice;
+reactorPriceEl.textContent=reactorPrice;
+ascPriceEl.textContent=ascPrice;
 
 pCoins.textContent=coins;
 pTaps.textContent=taps;
 pTap.textContent=tapPower;
 pAuto.textContent=auto;
 pBonus.textContent=bonus;
-pMulti.textContent=multi;
+pCore.textContent=core.toFixed(2);
+pRegen.textContent=regen;
+pAsc.textContent=asc?"ДА":"НЕТ";
 }
 
 function tap(){
 if(energy<=0)return;
-const gain=Math.floor(tapPower*(1+bonus/100)*multi);
+const gain=Math.floor(tapPower*(1+bonus/100)*core);
 coins+=gain;
 energy--;
 taps++;
 save();update();
 }
 
-function buyTap(){if(coins<tapPrice)return;coins-=tapPrice;tapPower++;tapPrice=Math.floor(tapPrice*1.7);save();update();}
-function buyEnergy(){if(coins<energyPrice)return;coins-=energyPrice;energyMax+=500;energy=energyMax;energyPrice=Math.floor(energyPrice*1.8);save();update();}
-function buyAuto(){if(coins<autoPrice)return;coins-=autoPrice;auto++;autoPrice=Math.floor(autoPrice*2.2);save();update();}
-function buyBonus(){if(coins<bonusPrice)return;coins-=bonusPrice;bonus+=10;bonusPrice=Math.floor(bonusPrice*2.5);save();update();}
-function buyMulti(){if(multi>=2||coins<multiPrice)return;coins-=multiPrice;multi=2;save();update();}
-function buyVIP(){if(vip||coins<vipPrice)return;coins-=vipPrice;vip=1;multi=3;auto+=5;save();update();}
+function buyTap(){if(coins<tapPrice)return;coins-=tapPrice;tapPower++;tapPrice=Math.floor(tapPrice*1.6);save();update();}
+function buyEnergy(){if(coins<energyPrice)return;coins-=energyPrice;energyMax+=500;energy=energyMax;energyPrice=Math.floor(energyPrice*1.7);save();update();}
+function buyAuto(){if(coins<autoPrice)return;coins-=autoPrice;auto++;autoPrice=Math.floor(autoPrice*2);save();update();}
+function buyBonus(){if(coins<bonusPrice)return;coins-=bonusPrice;bonus+=10;bonusPrice=Math.floor(bonusPrice*2.3);save();update();}
+function buyCore(){if(coins<corePrice)return;coins-=corePrice;core*=1.1;corePrice=Math.floor(corePrice*3);save();update();}
+function buyReactor(){if(coins<reactorPrice)return;coins-=reactorPrice;regen++;reactorPrice=Math.floor(reactorPrice*3.5);save();update();}
+function buyAscension(){if(asc||coins<ascPrice)return;asc=1;core*=1.5;auto+=5;save();update();}
 
 setInterval(()=>{
-coins+=auto*multi;
-if(energy<energyMax)energy++;
+coins+=auto*core;
+energy=Math.min(energyMax,energy+regen);
 save();update();
 },1000);
 
 function openModal(id){document.getElementById(id).style.display="flex"}
 function closeModal(id){document.getElementById(id).style.display="none"}
 
+const coinsEl=coins;
+const energyEl=energy;
+</script>
+
+<script>
 const coinsEl=document.getElementById("coins");
 const energyEl=document.getElementById("energy");
 const energyMaxEl=document.getElementById("energyMax");
@@ -195,8 +234,18 @@ const tapPriceEl=document.getElementById("tapPrice");
 const energyPriceEl=document.getElementById("energyPrice");
 const autoPriceEl=document.getElementById("autoPrice");
 const bonusPriceEl=document.getElementById("bonusPrice");
-const multiPriceEl=document.getElementById("multiPrice");
-const vipPriceEl=document.getElementById("vipPrice");
+const corePriceEl=document.getElementById("corePrice");
+const reactorPriceEl=document.getElementById("reactorPrice");
+const ascPriceEl=document.getElementById("ascPrice");
+
+const pCoins=document.getElementById("pCoins");
+const pTaps=document.getElementById("pTaps");
+const pTap=document.getElementById("pTap");
+const pAuto=document.getElementById("pAuto");
+const pBonus=document.getElementById("pBonus");
+const pCore=document.getElementById("pCore");
+const pRegen=document.getElementById("pRegen");
+const pAsc=document.getElementById("pAsc");
 
 update();
 </script>
