@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEON VOID</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
@@ -40,6 +39,11 @@ font-size: 28px;
 font-weight: bold;
 box-shadow: 0 0 20px #ff00ff;
 cursor: pointer;
+transition: transform 0.1s;
+}
+
+.circle:active {
+transform: scale(0.95);
 }
 
 .score {
@@ -58,7 +62,7 @@ background: #121622;
 }
 
 .btn {
-padding: 10px 15px;
+padding: 10px 12px;
 border: none;
 border-radius: 10px;
 background: linear-gradient(90deg, #ff00ff, #7a00ff);
@@ -69,13 +73,13 @@ cursor: pointer;
 
 .screen {
 display: none;
-padding: 20px;
+padding: 15px;
 }
 
 .shop-item {
 background: #1a1f2b;
 padding: 10px;
-margin: 10px;
+margin: 8px;
 border-radius: 10px;
 }
 </style>
@@ -91,7 +95,7 @@ border-radius: 10px;
 
 <div class="score">⭐ Очки: <span id="score">0</span></div>
 
-<!-- Экраны -->
+<!-- ===== МАГАЗИН ===== -->
 <div id="shop" class="screen">
 <h3>🛒 Магазин</h3>
 
@@ -110,21 +114,34 @@ border-radius: 10px;
 <button class="btn" onclick="buyRegen(500)">Купить</button>
 </div>
 
+<div class="shop-item">
+🔥 Буст +5 к тапу — цена: 1200 ⭐  
+<button class="btn" onclick="buyBigTap(1200)">Купить</button>
+</div>
+
+<div class="shop-item">
+⚡ +2000 энергии — цена: 2500 ⭐  
+<button class="btn" onclick="buyHugeEnergy(2500)">Купить</button>
+</div>
+
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
+<!-- ===== ПРОФИЛЬ ===== -->
 <div id="profile" class="screen">
 <h3>👤 Профиль</h3>
 <div id="pinfo"></div>
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
+<!-- ===== ЛИДЕРБОРД ===== -->
 <div id="leaderboard" class="screen">
 <h3>🏆 Лидерборд</h3>
 <div id="lbList">Загрузка...</div>
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
+<!-- ===== НАСТРОЙКИ ===== -->
 <div id="settings" class="screen">
 <h3>⚙️ Настройки</h3>
 <button class="btn" onclick="setLang('ru')">Русский</button>
@@ -134,7 +151,7 @@ border-radius: 10px;
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
-<!-- Нижнее меню -->
+<!-- ===== НИЖНЕЕ МЕНЮ ===== -->
 <div class="bottom">
 <button class="btn" onclick="openScreen('shop')">🛒 Магазин</button>
 <button class="btn" onclick="openScreen('profile')">👤 Профиль</button>
@@ -153,26 +170,70 @@ let score = 0;
 let tapPower = 1;
 let regenSpeed = 1800; // 30 минут до фула
 
+const USER_ID = Telegram.WebApp.initDataUnsafe.user.id;
+const USER_NAME = Telegram.WebApp.initDataUnsafe.user.first_name;
+
+// ====== ЗАГРУЗКА ПРОГРЕССА ======
+async function loadProgress(){
+try {
+let res = await fetch(SERVER + "/get_user?user_id=" + USER_ID);
+let data = await res.json();
+
+if(data && data.score !== undefined){
+score = data.score;
+tapPower = data.tapPower || 1;
+maxEnergy = data.maxEnergy || 4000;
+energy = Math.min(data.energy || maxEnergy, maxEnergy);
+}
+} catch(e){
+console.log("Render спит — беру локальные данные");
+let saved = localStorage.getItem("neon_progress");
+if(saved){
+let d = JSON.parse(saved);
+score = d.score;
+tapPower = d.tapPower;
+maxEnergy = d.maxEnergy;
+energy = d.energy;
+}
+}
+
+updateUI();
+}
+
+// ====== АВТОСОХРАНЕНИЕ ======
+async function saveProgress(){
+let data = {
+user_id: USER_ID,
+username: USER_NAME,
+score: score,
+tapPower: tapPower,
+maxEnergy: maxEnergy,
+energy: energy
+};
+
+// в сервер
+fetch(SERVER + "/save_score", {
+method: "POST",
+headers: {"Content-Type":"application/json"},
+body: JSON.stringify(data)
+});
+
+// локально
+localStorage.setItem("neon_progress", JSON.stringify(data));
+}
+
+setInterval(saveProgress, 10000); // каждые 10 сек
+
+// ====== ТАП ======
 function tap(){
 if(energy > 0){
 energy -= 1;
 score += tapPower;
 updateUI();
-sendScore();
 }
 }
 
-function updateUI(){
-document.getElementById("energy").innerText = energy;
-document.getElementById("score").innerText = score;
-document.getElementById("pinfo").innerHTML =
-`ID: ${Telegram.WebApp.initDataUnsafe.user.id}<br>
-Имя: ${Telegram.WebApp.initDataUnsafe.user.first_name}<br>
-Очки: ${score}<br>
-Сила тапа: ${tapPower}<br>
-Макс энергия: ${maxEnergy}`;
-}
-
+// ====== РЕГЕН ЭНЕРГИИ ======
 function regen(){
 if(energy < maxEnergy){
 energy += 1;
@@ -181,10 +242,19 @@ updateUI();
 }
 setInterval(regen, regenSpeed / maxEnergy * 1000);
 
+// ====== МАГАЗИН ======
 function buyTap(price){
 if(score >= price){
 score -= price;
 tapPower += 1;
+updateUI();
+}
+}
+
+function buyBigTap(price){
+if(score >= price){
+score -= price;
+tapPower += 5;
 updateUI();
 }
 }
@@ -198,14 +268,37 @@ updateUI();
 }
 }
 
-function buyRegen(price){
+function buyHugeEnergy(price){
 if(score >= price){
 score -= price;
-regenSpeed -= 300;
+maxEnergy += 2000;
+energy = maxEnergy;
 updateUI();
 }
 }
 
+function buyRegen(price){
+if(score >= price){
+score -= price;
+regenSpeed = Math.max(600, regenSpeed - 300);
+updateUI();
+}
+}
+
+// ====== UI ======
+function updateUI(){
+document.getElementById("energy").innerText = energy;
+document.getElementById("score").innerText = score;
+
+document.getElementById("pinfo").innerHTML =
+`ID: ${USER_ID}<br>
+Имя: ${USER_NAME}<br>
+Очки: ${score}<br>
+Сила тапа: ${tapPower}<br>
+Макс энергия: ${maxEnergy}`;
+}
+
+// ====== ЭКРАНЫ ======
 function openScreen(id){
 closeAll();
 document.getElementById(id).style.display = "block";
@@ -216,20 +309,10 @@ function closeAll(){
 document.querySelectorAll(".screen").forEach(e=>e.style.display="none");
 }
 
-// Лидерборд
-async function sendScore(){
-fetch(SERVER + "/save_score", {
-method: "POST",
-headers: {"Content-Type": "application/json"},
-body: JSON.stringify({
-user_id: Telegram.WebApp.initDataUnsafe.user.id,
-username: Telegram.WebApp.initDataUnsafe.user.first_name,
-score: score
-})
-});
-}
-
+// ====== ЛИДЕРБОРД ======
 async function loadLeaderboard(){
+document.getElementById("lbList").innerHTML = "Загрузка...";
+try {
 let res = await fetch(SERVER + "/leaderboard");
 let data = await res.json();
 
@@ -239,15 +322,19 @@ html += `#${p.place} ${p.name} — ${p.score} ⭐<br>`;
 });
 
 document.getElementById("lbList").innerHTML = html;
+} catch(e){
+document.getElementById("lbList").innerHTML = "Ошибка загрузки. Попробуй позже.";
+}
 }
 
-// Языки (упрощённо)
+// ====== ЯЗЫКИ ======
 function setLang(l){
 alert("Язык сменён на: " + l);
 }
 
+loadProgress();
 updateUI();
 </script>
 
 </body>
-</html>
+  </html>
