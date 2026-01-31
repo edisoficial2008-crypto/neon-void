@@ -1,31 +1,69 @@
-let points = 124;
-let energy = 3963;
+let data = JSON.parse(localStorage.getItem("neonVoid")) || {
+  coins: 0,
+  energy: 4000,
+  maxEnergy: 4000,
+  tapPower: 1,
+  taps: 0
+};
 
-const tapZone = document.getElementById("tapZone");
-
-tapZone.addEventListener("click", (e) => {
-  if (energy <= 0) return;
-
-  points++;
-  energy--;
-
-  document.getElementById("points").innerText = points;
-  document.getElementById("energy").innerText = energy;
-
-  const num = document.createElement("div");
-  num.className = "tap-number";
-  num.innerText = "+1";
-  num.style.left = e.clientX + "px";
-  num.style.top = e.clientY + "px";
-
-  document.body.appendChild(num);
-  setTimeout(() => num.remove(), 1000);
-});
-
-function openModal(id) {
-  document.getElementById(id).style.display = "flex";
+// ЖЁСТКО ЧИНИМ ЭНЕРГИЮ
+if (data.energy > data.maxEnergy) {
+  data.energy = data.maxEnergy;
 }
 
-function closeModal() {
-  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+const coinsEl = document.getElementById("coins");
+const energyEl = document.getElementById("energy");
+const maxEnergyEl = document.getElementById("maxEnergy");
+const tapsEl = document.getElementById("taps");
+const tapPowerEl = document.getElementById("tapPower");
+
+function save() {
+  localStorage.setItem("neonVoid", JSON.stringify(data));
 }
+
+function updateUI() {
+  coinsEl.textContent = data.coins;
+  energyEl.textContent = data.energy;
+  maxEnergyEl.textContent = data.maxEnergy;
+  tapsEl.textContent = data.taps;
+  tapPowerEl.textContent = data.tapPower;
+}
+
+document.getElementById("tapCircle").onclick = () => {
+  if (data.energy <= 0) return;
+
+  data.coins += data.tapPower;
+  data.energy -= 1;
+  data.taps++;
+
+  save();
+  updateUI();
+};
+
+function buyUpgrade() {
+  if (data.coins >= 1000) {
+    data.coins -= 1000;
+    data.tapPower += 1;
+    save();
+    updateUI();
+  }
+}
+
+function openWindow(id) {
+  document.getElementById(id).style.display = "block";
+}
+
+function closeWindow() {
+  document.querySelectorAll(".window").forEach(w => w.style.display = "none");
+}
+
+// РЕГЕН ЭНЕРГИИ
+setInterval(() => {
+  if (data.energy < data.maxEnergy) {
+    data.energy++;
+    save();
+    updateUI();
+  }
+}, 1000);
+
+updateUI();
