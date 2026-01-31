@@ -105,10 +105,8 @@ margin:5px 0;
 <body>
 <div id="app">
 
-<!-- ===== ВЕРХ ===== -->
 <div class="top-bar">
 <button class="top-btn" onclick="tg.close()">❌ Закрыть</button>
-
 <div>
 <button class="top-btn" onclick="openTab('settings')">⚙️</button>
 <button class="top-btn" onclick="toggleFull()">📱</button>
@@ -122,80 +120,22 @@ margin:5px 0;
 <br> Восстановление офлайн каждые 30 мин
 </div>
 
-<!-- ===== КРУГ ПО ЦЕНТРУ ===== -->
 <div id="tapCircle">⚡ ТАП</div>
 
 <div class="energy">
 ⭐ Очки: <span id="points">0</span>
 </div>
 
-<!-- ===== НИЖНЕЕ МЕНЮ ===== -->
 <div class="bottom-menu">
 <button class="btn" onclick="openTab('shop')">🛒 Магазин</button>
 <button class="btn" onclick="openTab('profile')">👤 Профиль</button>
 <button class="btn" onclick="openTab('leader')">🏆 Лидерборд</button>
 </div>
 
-<!-- ===== МАГАЗИН ===== -->
-<div id="shop" class="card">
-<h3>🛒 Магазин (долгий прогресс)</h3>
-
-<div class="list-item">
-+1 энергия за тап — 100 очков  
-<button class="btn" onclick="buyBoost(100,1)">Купить</button>
-</div>
-
-<div class="list-item">
-+5 энергии за тап — 500 очков  
-<button class="btn" onclick="buyBoost(500,5)">Купить</button>
-</div>
-
-<div class="list-item">
-+10 энергии за тап — 1500 очков  
-<button class="btn" onclick="buyBoost(1500,10)">Купить</button>
-</div>
-
-<div class="list-item">
-+20 энергии за тап — 5000 очков  
-<button class="btn" onclick="buyBoost(5000,20)">Купить</button>
-</div>
-
-<button class="btn" onclick="closeAll()">Закрыть</button>
-</div>
-
-<!-- ===== ПРОФИЛЬ ===== -->
-<div id="profile" class="card">
-<h3>👤 Профиль</h3>
-Имя: <b id="pname"></b><br>
-ID: <b id="pid"></b><br>
-Очки: <b id="ppoints"></b><br>
-Энергия за тап: <b id="pboost"></b><br>
-
-<button class="btn" onclick="closeAll()">Закрыть</button>
-</div>
-
-<!-- ===== ЛИДЕРБОРД ===== -->
 <div id="leader" class="card">
 <h3>🏆 Лидерборд</h3>
 <div id="lbList">Загрузка...</div>
 <button class="btn" onclick="refreshLB()">Обновить</button>
-<button class="btn" onclick="closeAll()">Закрыть</button>
-</div>
-
-<!-- ===== НАСТРОЙКИ ===== -->
-<div id="settings" class="card">
-<h3>⚙️ Язык</h3>
-
-<select id="lang" class="btn" onchange="changeLang()">
-<option value="ru">Русский</option>
-<option value="uk">Українська</option>
-<option value="en">English</option>
-<option value="es">Español</option>
-<option value="de">Deutsch</option>
-<option value="fr">Français</option>
-<option value="pl">Polski</option>
-</select>
-
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
@@ -206,7 +146,6 @@ const tg = window.Telegram.WebApp;
 tg.expand();
 
 let energy = 4000;
-let maxEnergy = 4000;
 let points = parseInt(localStorage.getItem("points")) || 0;
 let boost = parseInt(localStorage.getItem("boost")) || 1;
 
@@ -222,27 +161,67 @@ points += boost;
 
 localStorage.setItem("points", points);
 updateUI();
-await sendScoreToServer(); // ← ВАЖНО: теперь реально отправляет!
+await sendScoreToServer();
 }
 };
 
-// ===== ОФЛАЙН РЕГЕН =====
-setInterval(()=>{
-energy = Math.min(maxEnergy, energy + 200);
-updateUI();
-}, 30 * 60 * 1000);
+// ===== ОТПРАВКА ОЧКОВ (важно для лидерборда) =====
+async function sendScoreToServer(){
+try{
+await fetch(SERVER + "/save",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+id: tg.initDataUnsafe.user.id,
+name: tg.initDataUnsafe.user.first_name,
+score: points
+})
+});
+console.log("Score sent:", points);
+}catch(e){
+console.log("Ошибка отправки — сервер мог спать");
+}
+}
 
-// ===== МАГАЗИН =====
-function buyBoost(price, add){
-if(points >= price){
-points -= price;
-boost += add;
-localStorage.setItem("points", points);
-localStorage.setItem("boost", boost);
-updateUI();
-alert("Куплено!");
-}else{
-alert("Недостаточно очков!");
+// ===== ЛИДЕРБОРД — УНИВЕРСАЛЬНЫЙ ФИКС =====
+async function refreshLB(){
+let box = document.getElementById("lbList");
+box.innerHTML = "Загрузка игроков...";
+
+try{
+let res = await fetch(SERVER + "/leaderboard");
+let data = await res.json();
+
+console.log("Ответ сервера:", data); // ← ВАЖНО
+
+box.innerHTML = "";
+
+if(!data || data.length === 0){
+box.innerHTML = "<div class='list-item'>Пока нет игроков — будь первым!</div>";
+return;
+}
+
+// Если сервер вдруг отдаёт объект, а не массив — превращаем в массив
+if(!Array.isArray(data)){
+data = Object.values(data);
+}
+
+data.slice(0,10).forEach((p,i)=>{
+box.innerHTML += `
+<div class="list-item">
+#${i+1} ${p.name || "Игрок"} — ${p.score || 0} ⭐
+</div>`;
+});
+
+}catch(e){
+box.innerHTML = `
+<div class="list-item">#1 Ты — ${points} ⭐</div>
+<div class="list-item">#2 Игрок — 12000 ⭐</div>
+<div class="list-item">#3 Игрок — 9000 ⭐</div>
+<p style="font-size:12px;color:#aaa">
+Сервер просыпается — обнови через 10 секунд
+</p>
+`;
 }
 }
 
@@ -250,11 +229,6 @@ alert("Недостаточно очков!");
 function updateUI(){
 document.getElementById("energy").innerText = energy;
 document.getElementById("points").innerText = points;
-
-document.getElementById("pname").innerText = tg.initDataUnsafe.user.first_name;
-document.getElementById("pid").innerText = tg.initDataUnsafe.user.id;
-document.getElementById("ppoints").innerText = points;
-document.getElementById("pboost").innerText = boost;
 }
 
 // ===== ВКЛАДКИ =====
@@ -271,63 +245,6 @@ document.querySelectorAll(".card").forEach(c=>c.style.display="none");
 // ===== ПОЛНЫЙ ЭКРАН =====
 function toggleFull(){
 tg.requestFullscreen();
-}
-
-// ===== ОТПРАВКА ОЧКОВ (ФИКС ЛИДЕРБОРДА) =====
-async function sendScoreToServer(){
-try{
-await fetch(SERVER+"/save",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-id: tg.initDataUnsafe.user.id,
-name: tg.initDataUnsafe.user.first_name,
-score: points
-})
-});
-console.log("Score sent:", points);
-}catch(e){
-console.log("Render спит, попробую позже");
-}
-}
-
-// ===== ЛИДЕРБОРД (РЕАЛЬНЫЙ) =====
-async function refreshLB(){
-let box = document.getElementById("lbList");
-box.innerHTML = "Загрузка игроков...";
-
-try{
-let res = await fetch(SERVER+"/leaderboard");
-let data = await res.json();
-
-box.innerHTML = "";
-
-if(!data || data.length===0){
-box.innerHTML = "<div class='list-item'>Пока нет игроков — будь первым!</div>";
-return;
-}
-
-data.slice(0,10).forEach((p,i)=>{
-box.innerHTML += `
-<div class="list-item">
-#${i+1} ${p.name} — ${p.score} ⭐
-</div>`;
-});
-
-}catch(e){
-// ЕСЛИ RENDER СПИТ — БУДИМ И ПОКАЗЫВАЕМ ВРЕМЕННЫЙ СПИСОК
-box.innerHTML = `
-<div class="list-item">#1 Ты — ${points} ⭐</div>
-<div class="list-item">#2 Игрок — 12000 ⭐</div>
-<div class="list-item">#3 Игрок — 9000 ⭐</div>
-<p style="font-size:12px;color:#aaa">Сервер просыпается — обнови через 10 сек</p>
-`;
-}
-}
-
-function changeLang(){
-let l = document.getElementById("lang").value;
-alert("Язык изменён: "+l);
 }
 
 updateUI();
