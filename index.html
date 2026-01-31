@@ -1,56 +1,199 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>NEON VOID — Energy Game</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON VOID</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at center, #0a1a3a, #000);
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 15px;
+}
+
+.title {
+  font-size: 28px;
+  letter-spacing: 3px;
+}
+
+.stats {
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+/* BUTTONS */
+.menu {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px;
+}
+
+.menu button {
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* TAP CIRCLE */
+.tap-zone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+.circle {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #4fc3ff, #1e88e5);
+  box-shadow: 0 0 40px #3fa9ff;
+  cursor: pointer;
+}
+
+/* MODALS */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #111;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+}
+
+.close {
+  text-align: right;
+  cursor: pointer;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+</style>
 </head>
+
 <body>
 
-<div class="top">
-  <h1>NEON VOID</h1>
+<div class="header">
+  <div class="title">NEON VOID</div>
   <div class="stats">
-    💰 <span id="coins">0</span>
+    💰 <span id="coins">0</span> |
     ⚡ <span id="energy">0</span>/<span id="maxEnergy">4000</span>
   </div>
 </div>
 
-<div class="buttons">
-  <button onclick="openWindow('shop')">🛒 Магазин</button>
-  <button onclick="openWindow('profile')">👤 Профиль</button>
-  <button onclick="openWindow('leaderboard')">🏆 Лидерборд</button>
+<div class="menu">
+  <button onclick="openModal('shop')">🛒 Магазин</button>
+  <button onclick="openModal('profile')">👤 Профиль</button>
+  <button onclick="openModal('leaderboard')">🏆 Лидерборд</button>
 </div>
 
-<div class="tap-area">
-  <div id="tapCircle"></div>
+<div class="tap-zone">
+  <div class="circle" onclick="tap()"></div>
 </div>
 
-<!-- ОКНА -->
-<div class="window" id="shop">
-  <div class="window-content">
-    <span class="close" onclick="closeWindow()">✖</span>
-    <h2>Магазин</h2>
-    <button onclick="buyUpgrade()">+1 к тапу (1000💰)</button>
+<!-- SHOP -->
+<div class="modal" id="shop">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✖</div>
+    <h3>Магазин</h3>
+    <p>⚡ +500 max энергии — 500 💰</p>
+    <button onclick="buyEnergy()">Купить</button>
   </div>
 </div>
 
-<div class="window" id="profile">
-  <div class="window-content">
-    <span class="close" onclick="closeWindow()">✖</span>
-    <h2>Профиль</h2>
+<!-- PROFILE -->
+<div class="modal" id="profile">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✖</div>
+    <h3>Профиль</h3>
     <p>Тапов: <span id="taps">0</span></p>
-    <p>Сила тапа: <span id="tapPower">1</span></p>
   </div>
 </div>
 
-<div class="window" id="leaderboard">
-  <div class="window-content">
-    <span class="close" onclick="closeWindow()">✖</span>
-    <h2>Лидерборд</h2>
+<!-- LEADERBOARD -->
+<div class="modal" id="leaderboard">
+  <div class="modal-content">
+    <div class="close" onclick="closeModal()">✖</div>
+    <h3>Лидерборд</h3>
     <p>Скоро...</p>
   </div>
 </div>
 
-<script src="script.js"></script>
+<script>
+let coins = Number(localStorage.getItem("coins")) || 0;
+let energy = Number(localStorage.getItem("energy")) || 4000;
+let maxEnergy = Number(localStorage.getItem("maxEnergy")) || 4000;
+let taps = Number(localStorage.getItem("taps")) || 0;
+
+function save() {
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("energy", energy);
+  localStorage.setItem("maxEnergy", maxEnergy);
+  localStorage.setItem("taps", taps);
+}
+
+function updateUI() {
+  document.getElementById("coins").textContent = coins;
+  document.getElementById("energy").textContent = energy;
+  document.getElementById("maxEnergy").textContent = maxEnergy;
+  document.getElementById("taps").textContent = taps;
+}
+
+function tap() {
+  if (energy <= 0) return;
+  coins += 1;
+  energy -= 1;
+  taps += 1;
+  save();
+  updateUI();
+}
+
+function buyEnergy() {
+  if (coins < 500) return alert("Не хватает монет");
+  coins -= 500;
+  maxEnergy += 500;
+  energy = Math.min(energy + 500, maxEnergy);
+  save();
+  updateUI();
+}
+
+function openModal(id) {
+  document.getElementById(id).style.display = "flex";
+}
+
+function closeModal() {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+}
+
+updateUI();
+</script>
+
 </body>
 </html>
