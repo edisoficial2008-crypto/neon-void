@@ -9,102 +9,124 @@
 
 <style>
 body {
- margin: 0;
- background: radial-gradient(circle, #120024, #000);
- color: white;
- font-family: Arial, sans-serif;
- text-align: center;
+    margin: 0;
+    background: radial-gradient(circle, #120024, #000);
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
 }
 
-.container {
- max-width: 420px;
- margin: auto;
- padding: 15px;
+.app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.card {
- background: rgba(255,255,255,0.08);
- border-radius: 15px;
- padding: 12px;
- margin: 10px 0;
- backdrop-filter: blur(8px);
+.header {
+    padding-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.energy {
+    margin-top: 10px;
+}
+
+.circle-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ff00ff, #00ccff);
+    box-shadow: 0 0 20px #ff00ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.menu {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 10px;
 }
 
 .btn {
- background: linear-gradient(90deg,#9b5cff,#ff4fff);
- color:white;
- border:none;
- padding:12px;
- border-radius:12px;
- width:100%;
- font-size:16px;
+    background: #ff00ff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
 }
 
-.flex {
- display:flex;
- gap:10px;
+.screen {
+    display: none;
+    padding: 20px;
 }
 
-.leader-item {
- display:flex;
- justify-content:space-between;
- background:rgba(255,255,255,0.1);
- padding:8px;
- border-radius:8px;
- margin:5px 0;
+.settings select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
 }
-
-.hidden { display:none; }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-<h2>💜 NEON VOID</h2>
-
-<div class="card">
-<h3>⚡ Энергия: <span id="energy">4000</span>/4000</h3>
-<button class="btn" onclick="tap()">⚡ ТАП</button>
+<div class="header">
+💜 NEON VOID
 </div>
 
-<div class="card">
-<h3>⭐ Очки: <span id="points">0</span></h3>
+<div class="energy" id="energyText">⚡ Энергия: 4000/4000</div>
+
+<div class="circle-container">
+<div class="circle" id="tapBtn">ТАП</div>
 </div>
 
-<div class="flex">
-<button class="btn" onclick="showShop()">🛒 Магазин</button>
-<button class="btn" onclick="showProfile()">👤 Профиль</button>
+<!-- Экраны -->
+<div id="shop" class="screen">🛒 Магазин (здесь будут покупки)</div>
+<div id="profile" class="screen">👤 Профиль игрока</div>
+<div id="leaderboard" class="screen">🏆 Лидерборд</div>
+
+<div id="settings" class="screen settings">
+<h3>⚙️ Настройки</h3>
+<select id="langSelect">
+<option value="ru">Русский</option>
+<option value="uk">Українська</option>
+<option value="en">English</option>
+<option value="es">Español</option>
+<option value="fr">Français</option>
+<option value="de">Deutsch</option>
+<option value="pt">Português</option>
+<option value="tr">Türkçe</option>
+<option value="ar">العربية</option>
+<option value="zh">中文</option>
+<option value="ja">日本語</option>
+</select>
+<br><br>
+<button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
-<button class="btn" onclick="showLeaderboard()">🏆 Лидерборд</button>
-<button class="btn" onclick="toggleFull()">📱 Полный экран</button>
-
-<!-- МАГАЗИН -->
-<div id="shop" class="card hidden">
-<h3>🛒 Магазин</h3>
-<button class="btn" onclick="buyBoost(1)">⚡ +5 энергия/сек (500 очков)</button>
-<button class="btn" onclick="buyBoost(2)">🔥 +10 энергия/сек (1500 очков)</button>
-<button class="btn" onclick="buyBoost(3)">🌌 +25 энергия/сек (5000 очков)</button>
-<button class="btn" onclick="hideAll()">Закрыть</button>
-</div>
-
-<!-- ПРОФИЛЬ -->
-<div id="profile" class="card hidden">
-<h3>👤 Профиль</h3>
-<p>ID: <span id="pid"></span></p>
-<p>Имя: <span id="pname"></span></p>
-<p>Очки: <span id="ppoints"></span></p>
-<p>Энергия: <span id="penergy"></span></p>
-<button class="btn" onclick="hideAll()">Закрыть</button>
-</div>
-
-<!-- ЛИДЕРБОРД -->
-<div id="leaders" class="card hidden">
-<h3>🏆 Топ игроков</h3>
-<div id="leaderList"></div>
-<button class="btn" onclick="hideAll()">Закрыть</button>
+<!-- Нижнее меню -->
+<div class="menu">
+<button class="btn" onclick="openScreen('shop')" id="btnShop">Магазин</button>
+<button class="btn" onclick="openScreen('profile')" id="btnProfile">Профиль</button>
+<button class="btn" onclick="openScreen('leaderboard')" id="btnLb">Лидерборд</button>
+<button class="btn" onclick="openScreen('settings')" id="btnSet">Настройки</button>
 </div>
 
 </div>
@@ -112,97 +134,150 @@ body {
 <script>
 Telegram.WebApp.ready();
 
-const SERVER = "https://neon-void-4.onrender.com";
-
-let user = Telegram.WebApp.initDataUnsafe.user;
-let uid = user.id;
-let name = user.first_name;
-
-document.getElementById("pid").innerText = uid;
-document.getElementById("pname").innerText = name;
-
-let points = 0;
+let maxEnergy = 4000;
 let energy = 4000;
-let regen = 2; // энергия в секунду
+let lastRecover = Date.now();
 
-// ТАП
-function tap(){
- if(energy > 0){
-   points += 1;
-   energy -= 1;
-   updateUI();
- }
+const texts = {
+ru: {
+ shop:"Магазин",
+ profile:"Профиль",
+ lb:"Лидерборд",
+ set:"Настройки",
+ tap:"ТАП",
+ energy:"⚡ Энергия:"
+},
+en: {
+ shop:"Shop",
+ profile:"Profile",
+ lb:"Leaderboard",
+ set:"Settings",
+ tap:"TAP",
+ energy:"⚡ Energy:"
+},
+uk: {
+ shop:"Магазин",
+ profile:"Профіль",
+ lb:"Лідерборд",
+ set:"Налаштування",
+ tap:"ТАП",
+ energy:"⚡ Енергія:"
+},
+es: {
+ shop:"Tienda",
+ profile:"Perfil",
+ lb:"Clasificación",
+ set:"Ajustes",
+ tap:"TOCAR",
+ energy:"⚡ Energía:"
+},
+fr: {
+ shop:"Boutique",
+ profile:"Profil",
+ lb:"Classement",
+ set:"Paramètres",
+ tap:"TAPER",
+ energy:"⚡ Énergie:"
+},
+de: {
+ shop:"Shop",
+ profile:"Profil",
+ lb:"Rangliste",
+ set:"Einstellungen",
+ tap:"TIPPEN",
+ energy:"⚡ Energie:"
+},
+pt: {
+ shop:"Loja",
+ profile:"Perfil",
+ lb:"Ranking",
+ set:"Configurações",
+ tap:"TOCAR",
+ energy:"⚡ Energia:"
+},
+tr: {
+ shop:"Mağaza",
+ profile:"Profil",
+ lb:"Liderlik",
+ set:"Ayarlar",
+ tap:"DOKUN",
+ energy:"⚡ Enerji:"
+},
+ar: {
+ shop:"متجر",
+ profile:"الملف",
+ lb:"ترتيب",
+ set:"إعدادات",
+ tap:"اضغط",
+ energy:"⚡ طاقة:"
+},
+zh: {
+ shop:"商店",
+ profile:"个人资料",
+ lb:"排行榜",
+ set:"设置",
+ tap:"点击",
+ energy:"⚡ 能量:"
+},
+ja: {
+ shop:"ショップ",
+ profile:"プロフィール",
+ lb:"ランキング",
+ set:"設定",
+ tap:"タップ",
+ energy:"⚡ エネルギー:"
+}
+};
+
+function applyLang(lang){
+localStorage.setItem("lang", lang);
+
+document.getElementById("btnShop").innerText = texts[lang].shop;
+document.getElementById("btnProfile").innerText = texts[lang].profile;
+document.getElementById("btnLb").innerText = texts[lang].lb;
+document.getElementById("btnSet").innerText = texts[lang].set;
+document.getElementById("tapBtn").innerText = texts[lang].tap;
+updateEnergy();
 }
 
-// Офлайн восстановление энергии
+document.getElementById("langSelect").onchange = (e)=>{
+applyLang(e.target.value);
+};
+
+function updateEnergy(){
+let lang = localStorage.getItem("lang") || "ru";
+document.getElementById("energyText").innerText =
+texts[lang].energy + " " + energy + "/" + maxEnergy;
+}
+
 setInterval(()=>{
- if(energy < 4000) energy += regen;
- if(energy > 4000) energy = 4000;
- updateUI();
-},1000);
+let now = Date.now();
+let diff = now - lastRecover;
 
-// Автосохранение на сервер
-setInterval(()=>{
- fetch(`${SERVER}/save/${uid}/${points}/${energy}/${encodeURIComponent(name)}`);
-},5000);
+if(diff >= 30 * 60 * 1000 && energy < maxEnergy){
+energy = Math.min(maxEnergy, energy + 500);
+lastRecover = now;
+updateEnergy();
+}
+}, 10000);
 
-function updateUI(){
- document.getElementById("points").innerText = points;
- document.getElementById("energy").innerText = energy;
- document.getElementById("ppoints").innerText = points;
- document.getElementById("penergy").innerText = energy;
+document.getElementById("tapBtn").onclick = ()=>{
+if(energy > 0){
+energy -= 1;
+updateEnergy();
+}
+};
+
+function openScreen(id){
+document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
+document.getElementById(id).style.display="block";
 }
 
-// Магазин
-function buyBoost(type){
- if(type==1 && points>=500){
-   points-=500; regen+=1;
- }
- if(type==2 && points>=1500){
-   points-=1500; regen+=2;
- }
- if(type==3 && points>=5000){
-   points-=5000; regen+=5;
- }
- updateUI();
+function closeAll(){
+document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
 }
 
-// Лидерборд
-async function showLeaderboard(){
- hideAll();
- document.getElementById("leaders").classList.remove("hidden");
-
- let res = await fetch(`${SERVER}/leaders`);
- let data = await res.json();
-
- let html="";
- data.forEach((p,i)=>{
-   html+=`<div class='leader-item'>
-     <span>${i+1}. ${p.name}</span>
-     <span>${p.points} ⭐</span>
-   </div>`;
- });
-
- document.getElementById("leaderList").innerHTML = html;
-}
-
-// Показ окон
-function showShop(){
- hideAll(); document.getElementById("shop").classList.remove("hidden");
-}
-function showProfile(){
- hideAll(); document.getElementById("profile").classList.remove("hidden");
-}
-function hideAll(){
- document.getElementById("shop").classList.add("hidden");
- document.getElementById("profile").classList.add("hidden");
- document.getElementById("leaders").classList.add("hidden");
-}
-
-// Полный экран
-function toggleFull(){
- Telegram.WebApp.requestFullscreen();
-}
+applyLang(localStorage.getItem("lang") || "ru");
 </script>
 
 </body>
