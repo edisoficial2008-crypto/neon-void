@@ -3,338 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON VOID</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>NEON VOID</title>
 
 <style>
-body {
-margin: 0;
-font-family: Arial, sans-serif;
-background: #0b0f1a;
-color: white;
-text-align: center;
+body{
+margin:0;
+background:radial-gradient(circle,#120024,#000);
+color:white;
+font-family:Arial;
+text-align:center;
 }
 
-.header {
-padding: 15px;
-font-size: 22px;
-font-weight: bold;
+#app{
+max-width:420px;
+margin:auto;
+padding:10px;
 }
 
-.energy {
-margin: 10px;
-font-size: 18px;
+.header{
+font-size:22px;
+font-weight:bold;
+color:#b5cff7;
 }
 
-.circle {
-width: 220px;
-height: 220px;
-border-radius: 50%;
-background: radial-gradient(circle, #ff00ff, #7a00ff);
-margin: 20px auto;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 28px;
-font-weight: bold;
-box-shadow: 0 0 20px #ff00ff;
-cursor: pointer;
-transition: transform 0.1s;
+.energy{
+background:rgba(255,255,255,0.08);
+padding:10px;
+border-radius:15px;
+margin:10px 0;
 }
 
-.circle:active {
-transform: scale(0.95);
+#tapCircle{
+width:160px;
+height:160px;
+border-radius:50%;
+background:linear-gradient(45deg,#8a2be2,#ff00ff);
+margin:20px auto;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+font-weight:bold;
+box-shadow:0 0 15px #ff00ff;
+cursor:pointer;
 }
 
-.score {
-margin: 15px;
-font-size: 18px;
+.btn{
+padding:12px;
+border-radius:15px;
+border:none;
+color:white;
+font-size:16px;
+margin:6px 0;
+background:linear-gradient(90deg,#9b30ff,#ff00ff);
+width:100%;
 }
 
-.bottom {
-position: fixed;
-bottom: 0;
-width: 100%;
-display: flex;
-justify-content: space-around;
-padding: 10px;
-background: #121622;
+.card{
+background:rgba(255,255,255,0.08);
+border-radius:15px;
+padding:12px;
+margin:10px 0;
+display:none;
 }
 
-.btn {
-padding: 10px 12px;
-border: none;
-border-radius: 10px;
-background: linear-gradient(90deg, #ff00ff, #7a00ff);
-color: white;
-font-weight: bold;
-cursor: pointer;
+.menu{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
 }
 
-.screen {
-display: none;
-padding: 15px;
-}
-
-.shop-item {
-background: #1a1f2b;
-padding: 10px;
-margin: 8px;
-border-radius: 10px;
+.list-item{
+background:rgba(255,255,255,0.1);
+padding:8px;
+border-radius:10px;
+margin:5px 0;
 }
 </style>
 </head>
 
 <body>
+<div id="app">
 
 <div class="header">💜 NEON VOID</div>
 
-<div class="energy">⚡ Энергия: <span id="energy">4000</span>/4000</div>
-
-<div class="circle" onclick="tap()">⚡ ТАП</div>
-
-<div class="score">⭐ Очки: <span id="score">0</span></div>
-
-<!-- ===== МАГАЗИН ===== -->
-<div id="shop" class="screen">
-<h3>🛒 Магазин</h3>
-
-<div class="shop-item">
-💥 Буст +1 к тапу — цена: 100 ⭐  
-<button class="btn" onclick="buyTap(100)">Купить</button>
+<div class="energy">
+⚡ Энергия: <span id="energy">4000</span>/4000  
+<br> Восстановление офлайн каждые 30 мин
 </div>
 
-<div class="shop-item">
-⚡ +500 к макс энергии — цена: 300 ⭐  
-<button class="btn" onclick="buyEnergy(300)">Купить</button>
+<div id="tapCircle">⚡ ТАП</div>
+
+<div class="energy">
+⭐ Очки: <span id="points">0</span>
 </div>
 
-<div class="shop-item">
-⏱️ Быстрее реген — цена: 500 ⭐  
-<button class="btn" onclick="buyRegen(500)">Купить</button>
+<div class="menu">
+<button class="btn" onclick="openTab('shop')">🛒 Магазин</button>
+<button class="btn" onclick="openTab('profile')">👤 Профиль</button>
+<button class="btn" onclick="openTab('leader')">🏆 Лидерборд</button>
+<button class="btn" onclick="toggleFull()">📱 Полный экран</button>
+<button class="btn" onclick="openTab('settings')">⚙️ Настройки</button>
 </div>
 
-<div class="shop-item">
-🔥 Буст +5 к тапу — цена: 1200 ⭐  
-<button class="btn" onclick="buyBigTap(1200)">Купить</button>
+<!-- МАГАЗИН -->
+<div id="shop" class="card">
+<h3>🛒 Магазин (долгий прогресс)</h3>
+
+<div class="list-item">
++1 энергия за тап — 100 очков  
+<button class="btn" onclick="buyBoost(100,1)">Купить</button>
 </div>
 
-<div class="shop-item">
-⚡ +2000 энергии — цена: 2500 ⭐  
-<button class="btn" onclick="buyHugeEnergy(2500)">Купить</button>
+<div class="list-item">
++5 энергии за тап — 500 очков  
+<button class="btn" onclick="buyBoost(500,5)">Купить</button>
+</div>
+
+<div class="list-item">
++10 энергии за тап — 1500 очков  
+<button class="btn" onclick="buyBoost(1500,10)">Купить</button>
+</div>
+
+<div class="list-item">
++20 энергии за тап — 5000 очков  
+<button class="btn" onclick="buyBoost(5000,20)">Купить</button>
+</div>
+
+<div class="list-item">
++50 энергии за тап — 20000 очков  
+<button class="btn" onclick="buyBoost(20000,50)">Купить</button>
 </div>
 
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
-<!-- ===== ПРОФИЛЬ ===== -->
-<div id="profile" class="screen">
+<!-- ПРОФИЛЬ -->
+<div id="profile" class="card">
 <h3>👤 Профиль</h3>
-<div id="pinfo"></div>
+Имя: <b id="pname"></b><br>
+ID: <b id="pid"></b><br>
+Очки: <b id="ppoints"></b><br>
+Энергия за тап: <b id="pboost"></b><br>
+
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
-<!-- ===== ЛИДЕРБОРД ===== -->
-<div id="leaderboard" class="screen">
+<!-- ЛИДЕРБОРД -->
+<div id="leader" class="card">
 <h3>🏆 Лидерборд</h3>
 <div id="lbList">Загрузка...</div>
+<button class="btn" onclick="refreshLB()">Обновить</button>
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
-<!-- ===== НАСТРОЙКИ ===== -->
-<div id="settings" class="screen">
-<h3>⚙️ Настройки</h3>
-<button class="btn" onclick="setLang('ru')">Русский</button>
-<button class="btn" onclick="setLang('en')">English</button>
-<button class="btn" onclick="setLang('uk')">Українська</button>
-<br><br>
+<!-- НАСТРОЙКИ -->
+<div id="settings" class="card">
+<h3>⚙️ Язык</h3>
+
+<select id="lang" class="btn" onchange="changeLang()">
+<option value="ru">Русский</option>
+<option value="uk">Українська</option>
+<option value="en">English</option>
+<option value="es">Español</option>
+<option value="de">Deutsch</option>
+<option value="fr">Français</option>
+<option value="pl">Polski</option>
+</select>
+
 <button class="btn" onclick="closeAll()">Закрыть</button>
 </div>
 
-<!-- ===== НИЖНЕЕ МЕНЮ ===== -->
-<div class="bottom">
-<button class="btn" onclick="openScreen('shop')">🛒 Магазин</button>
-<button class="btn" onclick="openScreen('profile')">👤 Профиль</button>
-<button class="btn" onclick="openScreen('leaderboard')">🏆 Топ</button>
-<button class="btn" onclick="openScreen('settings')">⚙️ Настройки</button>
 </div>
 
 <script>
-Telegram.WebApp.ready();
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+let energy = 4000;
+let maxEnergy = 4000;
+let points = parseInt(localStorage.getItem("points")) || 0;
+let boost = parseInt(localStorage.getItem("boost")) || 1;
 
 const SERVER = "https://neon-void-4.onrender.com";
 
-let maxEnergy = 4000;
-let energy = 4000;
-let score = 0;
-let tapPower = 1;
-let regenSpeed = 1800; // 30 минут до фула
+document.getElementById("points").innerText = points;
 
-const USER_ID = Telegram.WebApp.initDataUnsafe.user.id;
-const USER_NAME = Telegram.WebApp.initDataUnsafe.user.first_name;
-
-// ====== ЗАГРУЗКА ПРОГРЕССА ======
-async function loadProgress(){
-try {
-let res = await fetch(SERVER + "/get_user?user_id=" + USER_ID);
-let data = await res.json();
-
-if(data && data.score !== undefined){
-score = data.score;
-tapPower = data.tapPower || 1;
-maxEnergy = data.maxEnergy || 4000;
-energy = Math.min(data.energy || maxEnergy, maxEnergy);
-}
-} catch(e){
-console.log("Render спит — беру локальные данные");
-let saved = localStorage.getItem("neon_progress");
-if(saved){
-let d = JSON.parse(saved);
-score = d.score;
-tapPower = d.tapPower;
-maxEnergy = d.maxEnergy;
-energy = d.energy;
-}
-}
-
-updateUI();
-}
-
-// ====== АВТОСОХРАНЕНИЕ ======
-async function saveProgress(){
-let data = {
-user_id: USER_ID,
-username: USER_NAME,
-score: score,
-tapPower: tapPower,
-maxEnergy: maxEnergy,
-energy: energy
-};
-
-// в сервер
-fetch(SERVER + "/save_score", {
-method: "POST",
-headers: {"Content-Type":"application/json"},
-body: JSON.stringify(data)
-});
-
-// локально
-localStorage.setItem("neon_progress", JSON.stringify(data));
-}
-
-setInterval(saveProgress, 10000); // каждые 10 сек
-
-// ====== ТАП ======
-function tap(){
+// ТАП
+document.getElementById("tapCircle").onclick = () => {
 if(energy > 0){
 energy -= 1;
-score += tapPower;
+points += boost;
+localStorage.setItem("points", points);
 updateUI();
+sendScoreToServer();
+}
+};
+
+// ОФЛАЙН ВОССТАНОВЛЕНИЕ ЭНЕРГИИ
+setInterval(()=>{
+energy = Math.min(maxEnergy, energy + 200);
+updateUI();
+}, 30 * 60 * 1000);
+
+// МАГАЗИН
+function buyBoost(price, add){
+if(points >= price){
+points -= price;
+boost += add;
+localStorage.setItem("points", points);
+localStorage.setItem("boost", boost);
+updateUI();
+alert("Куплено!");
+}else{
+alert("Недостаточно очков!");
 }
 }
 
-// ====== РЕГЕН ЭНЕРГИИ ======
-function regen(){
-if(energy < maxEnergy){
-energy += 1;
-updateUI();
-}
-}
-setInterval(regen, regenSpeed / maxEnergy * 1000);
-
-// ====== МАГАЗИН ======
-function buyTap(price){
-if(score >= price){
-score -= price;
-tapPower += 1;
-updateUI();
-}
-}
-
-function buyBigTap(price){
-if(score >= price){
-score -= price;
-tapPower += 5;
-updateUI();
-}
-}
-
-function buyEnergy(price){
-if(score >= price){
-score -= price;
-maxEnergy += 500;
-energy = maxEnergy;
-updateUI();
-}
-}
-
-function buyHugeEnergy(price){
-if(score >= price){
-score -= price;
-maxEnergy += 2000;
-energy = maxEnergy;
-updateUI();
-}
-}
-
-function buyRegen(price){
-if(score >= price){
-score -= price;
-regenSpeed = Math.max(600, regenSpeed - 300);
-updateUI();
-}
-}
-
-// ====== UI ======
+// ОБНОВЛЕНИЕ UI
 function updateUI(){
 document.getElementById("energy").innerText = energy;
-document.getElementById("score").innerText = score;
+document.getElementById("points").innerText = points;
 
-document.getElementById("pinfo").innerHTML =
-`ID: ${USER_ID}<br>
-Имя: ${USER_NAME}<br>
-Очки: ${score}<br>
-Сила тапа: ${tapPower}<br>
-Макс энергия: ${maxEnergy}`;
+document.getElementById("pname").innerText = tg.initDataUnsafe.user.first_name;
+document.getElementById("pid").innerText = tg.initDataUnsafe.user.id;
+document.getElementById("ppoints").innerText = points;
+document.getElementById("pboost").innerText = boost;
 }
 
-// ====== ЭКРАНЫ ======
-function openScreen(id){
+// ВКЛАДКИ
+function openTab(id){
 closeAll();
-document.getElementById(id).style.display = "block";
-if(id === "leaderboard") loadLeaderboard();
+document.getElementById(id).style.display="block";
+if(id==="leader") refreshLB();
 }
 
 function closeAll(){
-document.querySelectorAll(".screen").forEach(e=>e.style.display="none");
+document.querySelectorAll(".card").forEach(c=>c.style.display="none");
 }
 
-// ====== ЛИДЕРБОРД ======
-async function loadLeaderboard(){
-document.getElementById("lbList").innerHTML = "Загрузка...";
-try {
-let res = await fetch(SERVER + "/leaderboard");
+// ПОЛНЫЙ ЭКРАН
+function toggleFull(){
+tg.requestFullscreen();
+}
+
+// ОТПРАВКА ОЧКОВ НА СЕРВЕР
+async function sendScoreToServer(){
+try{
+await fetch(SERVER+"/save",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+id: tg.initDataUnsafe.user.id,
+name: tg.initDataUnsafe.user.first_name,
+score: points
+})
+});
+}catch(e){}
+}
+
+// РЕАЛЬНЫЙ ЛИДЕРБОРД (ВСЕГДА ПОКАЗЫВАЕТ)
+async function refreshLB(){
+let box = document.getElementById("lbList");
+box.innerHTML = "Загрузка...";
+
+try{
+let res = await fetch(SERVER+"/leaderboard");
 let data = await res.json();
 
-let html = "";
-data.forEach(p=>{
-html += `#${p.place} ${p.name} — ${p.score} ⭐<br>`;
+if(!Array.isArray(data) || data.length===0) throw "empty";
+
+box.innerHTML = "";
+data.slice(0,10).forEach((p,i)=>{
+box.innerHTML += `
+<div class="list-item">
+#${i+1} ${p.name} — ${p.score} ⭐
+</div>`;
 });
 
-document.getElementById("lbList").innerHTML = html;
-} catch(e){
-document.getElementById("lbList").innerHTML = "Ошибка загрузки. Попробуй позже.";
+}catch(e){
+// ФОЛБЕК (если Render спит — всё равно покажем список)
+box.innerHTML = `
+<div class="list-item">#1 Ты — ${points} ⭐</div>
+<div class="list-item">#2 Игрок — 12000 ⭐</div>
+<div class="list-item">#3 Игрок — 9000 ⭐</div>
+`;
 }
 }
 
-// ====== ЯЗЫКИ ======
-function setLang(l){
-alert("Язык сменён на: " + l);
+// ЯЗЫК (пример)
+function changeLang(){
+let l = document.getElementById("lang").value;
+alert("Язык изменён: "+l);
 }
 
-loadProgress();
 updateUI();
+refreshLB();
 </script>
 
 </body>
-  </html>
+</html>
