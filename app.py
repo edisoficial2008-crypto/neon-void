@@ -24,24 +24,28 @@ def home():
 def webapp():
     return send_from_directory(".", "index.html")
 
-@app.route("/save/<user_id>/<points>/<energy>")
-def save_user(user_id, points, energy):
+# ===== СОХРАНЕНИЕ ПРОГРЕССА =====
+@app.route("/save/<user_id>/<points>/<energy>/<name>")
+def save_user(user_id, points, energy, name):
     data = load_data()
     data[user_id] = {
         "points": int(points),
-        "energy": int(energy)
+        "energy": int(energy),
+        "name": name
     }
     save_data(data)
     return jsonify({"status": "saved"})
 
+# ===== ПОЛУЧИТЬ ДАННЫЕ ИГРОКА =====
 @app.route("/get/<user_id>")
 def get_user(user_id):
     data = load_data()
     if user_id in data:
         return jsonify(data[user_id])
     else:
-        return jsonify({"points": 0, "energy": 4000})
+        return jsonify({"points": 0, "energy": 4000, "name": "Игрок"})
 
+# ===== РЕАЛЬНЫЙ ЛИДЕРБОРД =====
 @app.route("/leaders")
 def leaders():
     data = load_data()
@@ -58,6 +62,7 @@ def leaders():
         top20.append({
             "rank": rank,
             "user_id": uid,
+            "name": info.get("name", "Игрок"),
             "points": info["points"]
         })
         rank += 1
