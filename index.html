@@ -1,35 +1,238 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>NEON VOID — Energy Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON VOID</title>
 
-  <!-- Telegram WebApp -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+* { box-sizing: border-box; user-select: none; }
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #050b1a, #000);
+  font-family: Arial, sans-serif;
+  color: #fff;
+  overflow-x: hidden;
+  text-align: center;
+}
 
-  <link rel="stylesheet" href="style.css">
+h1 {
+  margin-top: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.stats {
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.btn {
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #eee;
+  color: #000;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#tap-btn {
+  width: 240px;
+  height: 240px;
+  margin: 70px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at top, #5ee7ff, #1e90ff);
+  box-shadow:
+    0 0 40px #3fdcff,
+    0 0 100px rgba(0,180,255,.9);
+}
+
+#tap-btn:active { transform: scale(0.94); }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.modal-box {
+  width: 90%;
+  max-width: 400px;
+  background: #0b1224;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.close {
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.item {
+  background: #121b38;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+@keyframes fly {
+  from { opacity:1; transform: translateY(0); }
+  to { opacity:0; transform: translateY(-40px); }
+}
+</style>
 </head>
+
 <body>
 
-  <h1>NEON VOID</h1>
+<h1>NEON VOID</h1>
+<div class="stats">
+💰 <span id="coins">0</span>
+&nbsp;&nbsp;
+⚡ <span id="energy">0</span>/<span id="energyMax">4000</span>
+</div>
 
-  <div class="stats">
-    <div>💰 <span id="coins">0</span></div>
-    <div>⚡ <span id="energy">100</span>/<span id="maxEnergy">100</span></div>
-  </div>
+<div class="buttons">
+<button class="btn" onclick="openModal('shop')">🛒 Магазин</button>
+<button class="btn" onclick="openModal('profile')">👤 Профиль</button>
+<button class="btn" onclick="openModal('leader')">🏆 Лидерборд</button>
+</div>
 
-  <!-- ОРБ БЕЗ КВАДРАТА -->
-  <div class="orb-container">
-    <div id="orb"></div>
-  </div>
+<div id="tap-btn" onclick="tap(event)"></div>
 
-  <div class="buttons">
-    <button onclick="openShop()">🛒 Магазин</button>
-    <button onclick="openProfile()">👤 Профиль</button>
-    <button onclick="openLeaderboard()">🏆 Лидерборд</button>
-  </div>
+<!-- МАГАЗИН -->
+<div class="modal" id="shop">
+<div class="modal-box">
+<span class="close" onclick="closeModal('shop')">✕</span>
+<h3>Магазин</h3>
 
-  <script src="game.js"></script>
+<div class="item" onclick="upgradeTap()">
+⚡ Сила тапа +1<br>
+Цена: <span id="tapPrice">50</span>
+</div>
+
+<div class="item" onclick="upgradeEnergy()">
+🔋 Макс энергия +500<br>
+Цена: <span id="energyPrice">150</span>
+</div>
+
+</div>
+</div>
+
+<!-- ПРОФИЛЬ -->
+<div class="modal" id="profile">
+<div class="modal-box">
+<span class="close" onclick="closeModal('profile')">✕</span>
+<h3>Профиль</h3>
+<p>Всего тапов: <span id="totalTaps">0</span></p>
+<p>Сила тапа: <span id="tapPower">1</span></p>
+</div>
+</div>
+
+<!-- ЛИДЕР -->
+<div class="modal" id="leader">
+<div class="modal-box">
+<span class="close" onclick="closeModal('leader')">✕</span>
+<h3>Лидерборд</h3>
+<p>Скоро...</p>
+</div>
+</div>
+
+<script>
+let coins = parseInt(localStorage.getItem("coins")) || 0;
+let energyMax = parseInt(localStorage.getItem("energyMax")) || 4000;
+let energy = parseInt(localStorage.getItem("energy")) || energyMax;
+
+let tapPower = parseInt(localStorage.getItem("tapPower")) || 1;
+let tapPrice = parseInt(localStorage.getItem("tapPrice")) || 50;
+let energyPrice = parseInt(localStorage.getItem("energyPrice")) || 150;
+let totalTaps = parseInt(localStorage.getItem("totalTaps")) || 0;
+
+function save() {
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("energy", energy);
+  localStorage.setItem("energyMax", energyMax);
+  localStorage.setItem("tapPower", tapPower);
+  localStorage.setItem("tapPrice", tapPrice);
+  localStorage.setItem("energyPrice", energyPrice);
+  localStorage.setItem("totalTaps", totalTaps);
+}
+
+function update() {
+  document.getElementById("coins").textContent = coins;
+  document.getElementById("energy").textContent = energy;
+  document.getElementById("energyMax").textContent = energyMax;
+  document.getElementById("tapPower").textContent = tapPower;
+  document.getElementById("tapPrice").textContent = tapPrice;
+  document.getElementById("energyPrice").textContent = energyPrice;
+  document.getElementById("totalTaps").textContent = totalTaps;
+}
+
+function tap(e) {
+  if (energy <= 0) return;
+  coins += tapPower;
+  energy -= 1;
+  totalTaps++;
+
+  flyText(e.clientX, e.clientY, "+" + tapPower);
+  save();
+  update();
+}
+
+function flyText(x,y,t) {
+  const d = document.createElement("div");
+  d.textContent = t;
+  d.style.position="fixed";
+  d.style.left=x+"px";
+  d.style.top=y+"px";
+  d.style.animation="fly .8s ease-out forwards";
+  d.style.color="#6ff";
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),800);
+}
+
+function upgradeTap() {
+  if (coins < tapPrice) return;
+  coins -= tapPrice;
+  tapPower++;
+  tapPrice = Math.floor(tapPrice * 1.7);
+  save(); update();
+}
+
+function upgradeEnergy() {
+  if (coins < energyPrice) return;
+  coins -= energyPrice;
+  energyMax += 500;
+  energy = energyMax;
+  energyPrice = Math.floor(energyPrice * 1.8);
+  save(); update();
+}
+
+function openModal(id){ document.getElementById(id).style.display="flex"; }
+function closeModal(id){ document.getElementById(id).style.display="none"; }
+
+setInterval(()=>{
+  if (energy < energyMax) {
+    energy++;
+    save(); update();
+  }
+}, 1500);
+
+update();
+</script>
+
 </body>
 </html>
