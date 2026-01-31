@@ -24,7 +24,6 @@ def home():
 def webapp():
     return send_from_directory(".", "index.html")
 
-# === СОХРАНЕНИЕ ПРОГРЕССА ===
 @app.route("/save/<user_id>/<points>/<energy>")
 def save_user(user_id, points, energy):
     data = load_data()
@@ -35,7 +34,6 @@ def save_user(user_id, points, energy):
     save_data(data)
     return jsonify({"status": "saved"})
 
-# === ПОЛУЧИТЬ ДАННЫЕ ИГРОКА ===
 @app.route("/get/<user_id>")
 def get_user(user_id):
     data = load_data()
@@ -44,19 +42,16 @@ def get_user(user_id):
     else:
         return jsonify({"points": 0, "energy": 4000})
 
-# === РЕАЛЬНЫЙ ЛИДЕРБОРД ===
 @app.route("/leaders")
 def leaders():
     data = load_data()
 
-    # сортируем по очкам (по убыванию)
     sorted_players = sorted(
         data.items(),
         key=lambda x: x[1]["points"],
         reverse=True
     )
 
-    # берём топ-20
     top20 = []
     rank = 1
     for uid, info in sorted_players[:20]:
